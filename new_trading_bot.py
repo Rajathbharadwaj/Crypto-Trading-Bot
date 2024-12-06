@@ -9,14 +9,14 @@ from rich.table import Table
 import pytz
 
 class GoldTradingBot:
-    def __init__(self):
+    def __init__(self, timeframe=mt5.TIMEFRAME_M5, name="GoldBot"):
+        self.name = name
+        self.timeframe = timeframe
+        self.running = True
         self.console = Console()
-        
-        # Trading configuration
         self.symbol = "XAUUSD"
-        self.timeframe = mt5.TIMEFRAME_M5
-        self.lot_size = 1.0  # Starting with minimum lot size
-        self.max_sl_pips = 30  # Maximum stop loss in pips
+        self.lot_size = 0.7
+        self.max_sl_pips = 30
         self.volatility_threshold = 0.5
         self.trade_taken = False
         self.count = 2000
@@ -116,14 +116,15 @@ class GoldTradingBot:
         return df
     
     def get_trading_signal(self, df):
-        """Generate trading signals with detailed condition checking"""
-        if df.empty or len(df) < 2:
+        """Generate trading signals with new candle confirmation"""
+        if df.empty or len(df) < 3:  # Need at least 3 candles now
             return None, None
             
-        last_row = df.iloc[-1]
-        prev_row = df.iloc[-2]
+        last_row = df.iloc[-1]      # Current candle
+        prev_row = df.iloc[-2]      # Previous candle
+        third_row = df.iloc[-3]     # Candle before previous
         
-        # Check if trade is already active
+        # Check if trade is active
         active_trades = self.get_active_trades()
         if active_trades:
             trade = active_trades[0]
@@ -147,20 +148,24 @@ class GoldTradingBot:
         else:
             self.console.print("[green]✓ Volatility condition met[/green]")
         
-        # Check Supertrend transition
-        if last_row['supertrend_direction'] == 1 and prev_row['supertrend_direction'] == -1:
-            self.console.print("[bold green]✓ BUY SIGNAL: Supertrend turned bullish[/bold green]")
+        # Check for Supertrend change on previous candle and take trade on new candle
+        if (prev_row['supertrend_direction'] == 1 and 
+            third_row['supertrend_direction'] == -1 and
+            last_row['supertrend_direction'] == 1):
+            self.console.print("[bold green]✓ BUY SIGNAL: Supertrend turned bullish and new candle confirmed[/bold green]")
             return "BUY", f"Volatility ({last_row['volatility_switch']:.3f})"
             
-        elif last_row['supertrend_direction'] == -1 and prev_row['supertrend_direction'] == 1:
-            self.console.print("[bold red]✓ SELL SIGNAL: Supertrend turned bearish[/bold red]")
+        elif (prev_row['supertrend_direction'] == -1 and 
+              third_row['supertrend_direction'] == 1 and
+              last_row['supertrend_direction'] == -1):
+            self.console.print("[bold red]✓ SELL SIGNAL: Supertrend turned bearish and new candle confirmed[/bold red]")
             return "SELL", f"Volatility ({last_row['volatility_switch']:.3f})"
         
         # If no transition, show current direction
         if last_row['supertrend_direction'] == 1:
-            self.console.print("⚠️ Supertrend is bullish but no transition")
+            self.console.print("⚠️ Supertrend is bullish but waiting for new candle confirmation")
         else:
-            self.console.print("⚠️ Supertrend is bearish but no transition")
+            self.console.print("⚠️ Supertrend is bearish but waiting for new candle confirmation")
         
         return None, None
 
@@ -588,7 +593,7 @@ class GoldTradingBot:
                 self.console.clear()
                 
                 # Get market data
-                df = self.get_rates_df(1000)
+                df = self.get_rates_df(5000)
                 if df is None:
                     continue
                     
