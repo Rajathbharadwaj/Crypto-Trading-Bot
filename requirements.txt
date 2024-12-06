@@ -1,0 +1,6 @@
+MetaTrader5
+pandas
+pandas-ta
+numpy
+rich
+pytz 
