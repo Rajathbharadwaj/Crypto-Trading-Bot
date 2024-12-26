@@ -21,22 +21,26 @@ class GoldTradingBot:
         self.trade_taken = False
         self.count = 2000
         
-        # Trading hours (IST)
-        self.trading_start = "11:00:00"
-        self.trading_end = "02:30:00"
+        # Trading hours (Toronto Time)
+        self.trading_start = "01:30:00"  # 1:30 AM Toronto (= 11:00 AM IST)
+        self.trading_end = "17:00:00"    # 5:00 PM Toronto (= 2:30 AM IST next day)
         
-        # Initialize MT5
+        # Check if MT5 is already initialized
         if not self.initialize_mt5():
-            raise Exception("MT5 initialization failed!")
+            self.console.print("[bold red]MT5 initialization failed![/bold red]")
+            return
             
     def initialize_mt5(self):
         """Initialize MT5 connection"""
-        if not mt5.initialize():
+        if not mt5.initialize(path="C:\\Program Files\\MetaTrader 5\\terminal64.exe",  # Add this line with your MT5 path
+        login=190524521,        # Verify this is your actual account number
+        password="QAZwsx456!",  # Verify this is your actual password
+        server="Exness-MT5Trial14"):
             self.console.print("[bold red]MT5 initialization failed![/bold red]")
             return False
             
         # Login to MT5 (use your credentials)
-        if not mt5.login(login=190111246, password="QAZwsx456!", server="Exness-MT5Trial14"):
+        if not mt5.login(login=190524521, password="QAZwsx456!", server="Exness-MT5Trial14"):
             self.console.print("[bold red]MT5 login failed![/bold red]")
             mt5.shutdown()
             return False
@@ -58,22 +62,31 @@ class GoldTradingBot:
         return True
 
     def is_trading_time(self):
-        """Check if current time is within trading hours (IST)"""
-        ist = pytz.timezone('Asia/Kolkata')
-        current_time = datetime.now(ist)
+        """Check if current time is within trading hours (Toronto Time)"""
+        toronto_tz = pytz.timezone('America/Toronto')
+        current_time = datetime.now(toronto_tz)
         
         # Convert trading hours to datetime objects
-        start_time = datetime.strptime(self.trading_start, "%H:%M:%S").time()
-        end_time = datetime.strptime(self.trading_end, "%H:%M:%S").time()
+        start_time = datetime.strptime(self.trading_start, "%H:%M:%S").time()  # 1:30 AM
+        end_time = datetime.strptime(self.trading_end, "%H:%M:%S").time()      # 5:00 PM
         
         current_time = current_time.time()
         
-        # Handle overnight trading (when end time is on next day)
-        if end_time < start_time:
-            return current_time >= start_time or current_time <= end_time
-        else:
-            return start_time <= current_time <= end_time
+        # Debug info
+        self.console.print(f"\n=== Trading Hours (Toronto Time) ===")
+        self.console.print(f"Current time: {current_time.strftime('%I:%M:%S %p')}")
+        self.console.print(f"Trading window: {start_time.strftime('%I:%M:%S %p')} - {end_time.strftime('%I:%M:%S %p')}")
         
+        # Check if current time is within trading hours
+        is_trading_allowed = start_time <= current_time <= end_time
+        
+        if is_trading_allowed:
+            self.console.print("[green]Trading allowed: Within session hours[/green]")
+        else:
+            self.console.print("[red]Trading not allowed: Outside trading hours[/red]")
+        
+        return is_trading_allowed
+
     def calculate_supertrend(self, df, period=10, multiplier=3):
         """Calculate Supertrend with direction verification"""
         st = df.ta.supertrend(
