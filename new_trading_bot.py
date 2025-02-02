@@ -19,7 +19,7 @@ class GoldTradingBot:
         self.max_sl_pips = 30  # Maximum stop loss in pips
         self.volatility_threshold = 0.5
         self.trade_taken = False
-        self.count = 2000
+        self.count = 5000
         
         # Trading hours (IST)
         self.trading_start = "11:00:00"
@@ -36,7 +36,7 @@ class GoldTradingBot:
             return False
             
         # Login to MT5 (use your credentials)
-        if not mt5.login(login=190111246, password="QAZwsx456!", server="Exness-MT5Trial14"):
+        if not mt5.login(login=182992485, password="QAZwsx456!", server="Exness-MT5Trial6"):
             self.console.print("[bold red]MT5 login failed![/bold red]")
             mt5.shutdown()
             return False
@@ -117,11 +117,13 @@ class GoldTradingBot:
     
     def get_trading_signal(self, df):
         """Generate trading signals with detailed condition checking"""
-        if df.empty or len(df) < 2:
+        if df.empty or len(df) < 3:  # Need at least 3 candles
             return None, None
             
-        last_row = df.iloc[-1]
-        prev_row = df.iloc[-2]
+        # Get last three candles
+        last_row = df.iloc[-1]      # Current candle (where we might take trade)
+        prev_row = df.iloc[-2]      # Previous candle (where transition happened)
+        prev_prev_row = df.iloc[-3] # Candle before transition
         
         # Check if trade is already active
         active_trades = self.get_active_trades()
@@ -136,7 +138,8 @@ class GoldTradingBot:
 
         # Trading Conditions Check
         self.console.print("\n=== Signal Conditions ===")
-        self.console.print(f"Previous Supertrend: {prev_row['supertrend_direction']}")
+        self.console.print(f"Pre-Transition Supertrend: {prev_prev_row['supertrend_direction']}")
+        self.console.print(f"Transition Supertrend: {prev_row['supertrend_direction']}")
         self.console.print(f"Current Supertrend: {last_row['supertrend_direction']}")
         self.console.print(f"Volatility Switch: {last_row['volatility_switch']:.3f}")
         
@@ -147,20 +150,57 @@ class GoldTradingBot:
         else:
             self.console.print("[green]✓ Volatility condition met[/green]")
         
-        # Check Supertrend transition
-        if last_row['supertrend_direction'] == 1 and prev_row['supertrend_direction'] == -1:
-            self.console.print("[bold green]✓ BUY SIGNAL: Supertrend turned bullish[/bold green]")
-            return "BUY", f"Volatility ({last_row['volatility_switch']:.3f})"
-            
-        elif last_row['supertrend_direction'] == -1 and prev_row['supertrend_direction'] == 1:
-            self.console.print("[bold red]✓ SELL SIGNAL: Supertrend turned bearish[/bold red]")
-            return "SELL", f"Volatility ({last_row['volatility_switch']:.3f})"
+        # Check for BUY setup
+        buy_condition = (
+            prev_prev_row['supertrend_direction'] == -1 and  # Was bearish
+            prev_row['supertrend_direction'] == 1 and        # Turned bullish (transition happened here)
+            last_row['supertrend_direction'] == 1            # Still bullish (we take trade here)
+        )
         
-        # If no transition, show current direction
+        # Check for SELL setup
+        sell_condition = (
+            prev_prev_row['supertrend_direction'] == 1 and   # Was bullish
+            prev_row['supertrend_direction'] == -1 and       # Turned bearish (transition happened here)
+            last_row['supertrend_direction'] == -1           # Still bearish (we take trade here)
+        )
+        
+        if buy_condition:
+            self.console.print("[yellow]Valid BUY setup detected - Waiting 15 seconds...[/yellow]")
+            time.sleep(15)  # Wait for 15 seconds
+            
+            # Verify price after delay
+            tick = mt5.symbol_info_tick(self.symbol)
+            if tick is None:
+                self.console.print("[red]Failed to get current price[/red]")
+                return None, None
+                
+            if tick.last > last_row['supertrend_value']:
+                self.console.print("[bold green]✓ BUY SIGNAL: Taking trade after supertrend confirmation[/bold green]")
+                return "BUY", f"Volatility ({last_row['volatility_switch']:.3f})"
+            else:
+                self.console.print("[red]✗ Price below Supertrend after delay, skipping trade[/red]")
+            
+        elif sell_condition:
+            self.console.print("[yellow]Valid SELL setup detected - Waiting 15 seconds...[/yellow]")
+            time.sleep(15)  # Wait for 15 seconds
+            
+            # Verify price after delay
+            tick = mt5.symbol_info_tick(self.symbol)
+            if tick is None:
+                self.console.print("[red]Failed to get current price[/red]")
+                return None, None
+                
+            if tick.last < last_row['supertrend_value']:
+                self.console.print("[bold red]✓ SELL SIGNAL: Taking trade after supertrend confirmation[/bold red]")
+                return "SELL", f"Volatility ({last_row['volatility_switch']:.3f})"
+            else:
+                self.console.print("[red]✗ Price above Supertrend after delay, skipping trade[/red]")
+        
+        # If no valid setup, show current direction
         if last_row['supertrend_direction'] == 1:
-            self.console.print("⚠️ Supertrend is bullish but no transition")
+            self.console.print("⚠️ Supertrend is bullish but waiting for proper setup")
         else:
-            self.console.print("⚠️ Supertrend is bearish but no transition")
+            self.console.print("⚠️ Supertrend is bearish but waiting for proper setup")
         
         return None, None
 
@@ -582,15 +622,37 @@ class GoldTradingBot:
         """Main bot loop with status display"""
         self.console.print("[bold green]Starting Gold Trading Bot...[/bold green]")
         
+        connection_check_interval = 0  # Counter for connection checks
+        consecutive_errors = 0  # Counter for consecutive errors
+        last_error_time = None
+        
         while True:
             try:
                 # Clear screen for clean display
                 self.console.clear()
                 
+                # Periodic connection check (every 60 seconds)
+                if connection_check_interval >= 60:
+                    if not self.check_connection():
+                        self.console.print("[bold red]MT5 connection lost. Attempting to reconnect...[/bold red]")
+                        if not self.initialize_mt5():
+                            self.console.print("[bold red]Failed to reconnect. Retrying in 30 seconds...[/bold red]")
+                            time.sleep(30)
+                            continue
+                        self.console.print("[bold green]Successfully reconnected![/bold green]")
+                    connection_check_interval = 0
+                connection_check_interval += 1
+                
                 # Get market data
-                df = self.get_rates_df(1000)
+                df = self.get_rates_df()
                 if df is None:
+                    self.console.print("[yellow]Failed to get market data. Retrying...[/yellow]")
+                    time.sleep(5)
                     continue
+                
+                # Reset error counter on successful data fetch
+                consecutive_errors = 0
+                last_error_time = None
                     
                 # Calculate indicators
                 df = self.calculate_supertrend(df)
@@ -611,14 +673,38 @@ class GoldTradingBot:
                     if signal:
                         self.execute_trade(signal, df)
                 
+                # Display current status
+                self.display_market_status()
+                
                 time.sleep(1)  # Check every second
                 
             except KeyboardInterrupt:
                 self.console.print("[yellow]Bot shutdown requested...[/yellow]")
                 break
             except Exception as e:
-                self.console.print(f"[bold red]Error: {str(e)}[/bold red]")
-                time.sleep(5)
+                current_time = time.time()
+                
+                # Only increment error counter if more than 60 seconds have passed since last error
+                if last_error_time is None or current_time - last_error_time > 60:
+                    consecutive_errors += 1
+                    last_error_time = current_time
+                
+                self.console.print(f"[yellow]Warning: {str(e)}[/yellow]")
+                self.console.print("[yellow]Bot will continue running...[/yellow]")
+                
+                # If too many errors in a short time, wait longer
+                if consecutive_errors >= 5:
+                    self.console.print("[yellow]Multiple errors detected. Waiting 60 seconds before retry...[/yellow]")
+                    time.sleep(60)
+                    consecutive_errors = 0
+                else:
+                    time.sleep(5)
+                
+                # Try to reinitialize MT5 connection
+                if not mt5.initialize():
+                    self.initialize_mt5()
+                
+                continue  # Continue the loop instead of breaking
 
     def close_trade(self, position, reason="Manual"):
         """Close trade with reason logging"""
@@ -659,18 +745,22 @@ class GoldTradingBot:
             if result.retcode == mt5.TRADE_RETCODE_DONE:
                 self.log_trade('EXIT', 'SUCCESS', close_details)
                 self.trade_taken = False
+                self.console.print("[green]Trade closed successfully. Ready for new trades...[/green]")
                 return True
             else:
                 close_details['error'] = result.comment
                 self.log_trade('EXIT', 'FAILED', close_details)
-                return False
+                # Don't return False here, just log the error and continue
+                self.console.print(f"[yellow]Warning: Failed to close trade: {result.comment}[/yellow]")
+                return True  # Return True to keep the bot running
                 
         except Exception as e:
             self.log_trade('EXIT', 'ERROR', {
                 'error': str(e),
                 'position_ticket': position.ticket
             })
-            return False
+            self.console.print(f"[yellow]Warning: Error closing trade: {str(e)}[/yellow]")
+            return True  # Return True to keep the bot running
 
     def is_market_open(self):
         """Check if the market is currently open"""
@@ -726,3 +816,29 @@ class GoldTradingBot:
             self.console.print("[red]Failed to get positions![/red]")
         else:
             self.console.print(f"Active positions: {len(positions)}")
+
+    def check_connection(self):
+        """Check if MT5 connection is active"""
+        try:
+            # Try to get symbol info as a connection test
+            symbol_info = mt5.symbol_info(self.symbol)
+            if symbol_info is None:
+                self.console.print("[bold red]MT5 connection lost - Symbol info not available[/bold red]")
+                return False
+            
+            # Check if MT5 is initialized
+            if not mt5.initialize():
+                self.console.print("[bold red]MT5 connection lost - Terminal not initialized[/bold red]")
+                return False
+            
+            # Check if logged in
+            if not mt5.login(login=182992485, password="QAZwsx456!", server="Exness-MT5Trial6"):
+                self.console.print("[bold red]MT5 connection lost - Login failed[/bold red]")
+                return False
+            
+            self.console.print("[green]MT5 connection active[/green]")
+            return True
+            
+        except Exception as e:
+            self.console.print(f"[bold red]Error checking MT5 connection: {str(e)}[/bold red]")
+            return False
