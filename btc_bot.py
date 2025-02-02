@@ -463,7 +463,7 @@ class BTCTradingBot:
                 self.trade_taken = False
                 return True
             else:
-                self.console.print(f"[red]Failed to close trade: {result.comment}[/red]")
+                self.console.print(f"[red]Failed to close trade: {result.comment} (code: {result.retcode})[/red]")
                 return False
                 
         except Exception as e:
@@ -649,74 +649,144 @@ class BTCTradingBot:
         if not self.trailing_enabled:
             return
             
-        current_price = self.get_current_price()
-        if current_price is None:
+        # Get current bid/ask prices
+        symbol_info = mt5.symbol_info_tick(self.symbol)
+        if symbol_info is None:
             return
+            
+        # Use appropriate price based on position type
+        current_price = symbol_info.bid if position.type == 1 else symbol_info.ask
+            
+        # Calculate minimum stop distance (use 5x the spread as minimum)
+        min_stop_distance = (symbol_info.ask - symbol_info.bid) * 5
+        
+        # Debug info
+        self.console.print(
+            f"[blue]Debug Info:\n"
+            f"  Bid: ${symbol_info.bid:.2f}\n"
+            f"  Ask: ${symbol_info.ask:.2f}\n"
+            f"  Spread: ${symbol_info.ask - symbol_info.bid:.2f}\n"
+            f"  Min Stop Distance: ${min_stop_distance:.2f}\n"
+            f"  Current Price: ${current_price:.2f}[/blue]"
+        )
 
         if position.type == 0:  # BUY
-            # Calculate price movement
             price_move = current_price - position.price_open
             move_pct = price_move / position.price_open
             
-            # Check activation
             if move_pct >= self.trailing_activation_percent:
-                # Calculate new SL as current price minus trailing step
-                new_sl = current_price - (current_price * self.trailing_step_percent)
+                # Calculate new SL with minimum distance
+                new_sl = min(
+                    current_price - (current_price * self.trailing_step_percent),
+                    current_price - min_stop_distance
+                )
                 
-                # Only update if new SL is higher than current SL
                 if new_sl > position.sl:
                     new_tp = position.price_open + ((new_sl - position.price_open) * self.rr_ratio)
+                    
+                    # Round SL/TP to avoid floating point issues
+                    new_sl = round(new_sl, 2)
+                    new_tp = round(new_tp, 2)
                     
                     self.console.print(
                         f"[yellow]Trailing Update BUY @ ${current_price:.2f}:\n"
                         f"  SL Updated: ${position.sl:.2f} → ${new_sl:.2f}\n"
-                        f"  TP Updated: ${position.tp:.2f} → ${new_tp:.2f}[/yellow]"
+                        f"  TP Updated: ${position.tp:.2f} → ${new_tp:.2f}\n"
+                        f"  Distance to SL: ${current_price - new_sl:.2f}[/yellow]"
                     )
                     
                     request = {
-                        "action": mt5.TRADE_ACTION_MODIFY,
-                        "symbol": self.symbol,
+                        "action": mt5.TRADE_ACTION_SLTP,  # Only modify SL/TP
                         "position": position.ticket,
+                        "symbol": self.symbol,
                         "sl": new_sl,
-                        "tp": new_tp
+                        "tp": new_tp,
+                        "magic": 234000
                     }
+                    
+                    self.console.print(f"[cyan]Sending request: {request}[/cyan]")
                     result = mt5.order_send(request)
                     
                     if result.retcode != mt5.TRADE_RETCODE_DONE:
-                        self.console.print(f"[red]Failed to update trailing stop: {result.comment}[/red]")
+                        self.console.print(f"[red]Failed to update trailing stop: {result.comment} (code: {result.retcode})[/red]")
+                        # If failed due to invalid stops, try with wider distance
+                        if result.retcode == 10016:  # Invalid stops
+                            new_sl = round(current_price - (min_stop_distance * 3), 2)
+                            new_tp = round(position.price_open + ((new_sl - position.price_open) * self.rr_ratio), 2)
+                            request["sl"] = new_sl
+                            request["tp"] = new_tp
+                            
+                            self.console.print(f"[cyan]Retrying with request: {request}[/cyan]")
+                            result = mt5.order_send(request)
+                            
+                            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                                self.console.print(f"[red]Failed retry with wider stops: {result.comment} (code: {result.retcode})[/red]")
+                                # Try getting position info
+                                positions = mt5.positions_get(ticket=position.ticket)
+                                if positions:
+                                    pos = positions[0]
+                                    self.console.print(f"[blue]Current position state:\n  SL: ${pos.sl}\n  TP: ${pos.tp}\n  Price: ${pos.price_current}[/blue]")
                     
-                    # Partial close logic
                     if move_pct >= self.trailing_lock_percent:
                         self.close_partial_position(position)
                         self.console.print(f"[green]Profit Lock: {self.trailing_lock_percent*100}% position closed at ${current_price:.2f}[/green]")
-        
-        else:  # SELL trade
+                        
+        elif position.type == 1:  # SELL trade
             price_move = position.price_open - current_price
             move_pct = price_move / position.price_open
             
             if move_pct >= self.trailing_activation_percent:
-                new_sl = current_price + (current_price * self.trailing_step_percent)
+                # Calculate new SL with minimum distance
+                new_sl = max(
+                    current_price + (current_price * self.trailing_step_percent),
+                    current_price + min_stop_distance
+                )
                 
                 if new_sl < position.sl:
                     new_tp = position.price_open - ((position.price_open - new_sl) * self.rr_ratio)
                     
+                    # Round SL/TP to avoid floating point issues
+                    new_sl = round(new_sl, 2)
+                    new_tp = round(new_tp, 2)
+                    
                     self.console.print(
                         f"[yellow]Trailing Update SELL @ ${current_price:.2f}:\n"
                         f"  SL Updated: ${position.sl:.2f} → ${new_sl:.2f}\n"
-                        f"  TP Updated: ${position.tp:.2f} → ${new_tp:.2f}[/yellow]"
+                        f"  TP Updated: ${position.tp:.2f} → ${new_tp:.2f}\n"
+                        f"  Distance to SL: ${new_sl - current_price:.2f}[/yellow]"
                     )
                     
                     request = {
-                        "action": mt5.TRADE_ACTION_MODIFY,
-                        "symbol": self.symbol,
+                        "action": mt5.TRADE_ACTION_SLTP,  # Only modify SL/TP
                         "position": position.ticket,
+                        "symbol": self.symbol,
                         "sl": new_sl,
-                        "tp": new_tp
+                        "tp": new_tp,
+                        "magic": 234000
                     }
+                    
+                    self.console.print(f"[cyan]Sending request: {request}[/cyan]")
                     result = mt5.order_send(request)
                     
                     if result.retcode != mt5.TRADE_RETCODE_DONE:
-                        self.console.print(f"[red]Failed to update trailing stop: {result.comment}[/red]")
+                        self.console.print(f"[red]Failed to update trailing stop: {result.comment} (code: {result.retcode})[/red]")
+                        # If failed due to invalid stops, try with wider distance
+                        if result.retcode == 10016:  # Invalid stops
+                            new_sl = round(current_price + (min_stop_distance * 3), 2)
+                            new_tp = round(position.price_open - ((position.price_open - new_sl) * self.rr_ratio), 2)
+                            request["sl"] = new_sl
+                            request["tp"] = new_tp
+                            
+                            self.console.print(f"[cyan]Retrying with request: {request}[/cyan]")
+                            result = mt5.order_send(request)
+                            
+                            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                                self.console.print(f"[red]Failed retry with wider stops: {result.comment} (code: {result.retcode})[/red]")
+                                # Try getting position info
+                                positions = mt5.positions_get(ticket=position.ticket)
+                                if positions:
+                                    pos = positions[0]
+                                    self.console.print(f"[blue]Current position state:\n  SL: ${pos.sl}\n  TP: ${pos.tp}\n  Price: ${pos.price_current}[/blue]")
                     
                     if move_pct >= self.trailing_lock_percent:
                         self.close_partial_position(position)
@@ -757,4 +827,4 @@ class BTCTradingBot:
             self.console.print("[red]Failed to get current price[/red]")
             return None
         
-        return tick.ask if self.active_trades[0].type == 0 else tick.bid                                                            
+        return tick.ask if self.active_trades[0].type == 0 else tick.bid
