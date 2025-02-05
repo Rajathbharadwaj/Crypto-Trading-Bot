@@ -28,24 +28,32 @@ class BTCTradingBot:
         self.crossover_price = None
         self.crossover_price_index = -1
         # Trading configuration
-        self.lot_size = 0.5     # Fixed lot size
-        self.min_cross_distance = 0.0015  # 0.5% minimum distance
-        self.confirmation_period = 2
-        self.rr_ratio = 3.0
-        # Trailing stop configuration
+        self.lot_size = 1.0     # Fixed lot size
+        self.min_cross_distance = 0  # No minimum distance required
+        self.confirmation_period = 1  # Place trade at next candle open
+        
+        # Take Profit Levels
+        self.tp1_percent = 0.0025  # 0.25% for 0.40 lots
+        self.tp2_percent = 0.0050  # 0.50% for 0.20 lots
+        self.tp3_percent = 0.0075  # 0.75% for 0.20 lots
+        # Last 0.20 lot uses trailing stop
+        
+        # Stop Loss and Trailing configuration
+        self.initial_sl_percent = 0.0025  # 0.25% initial stop loss
         self.trailing_enabled = True
-        self.trailing_activation_percent = 0.003  # 0.3% activation
-        self.trailing_step_percent = 0.0015       # 0.15% step
-        self.trailing_lock_percent = 0.4          # 40% profit lock
+        self.trailing_activation_percent = 0.0075  # Activate at 0.75% profit
+        self.trailing_step_percent = 0.0025       # 0.25% step
+        self.trailing_trigger_step = 0.0025       # Move SL every 0.25% profit
         
         # Strategy Parameters
         self.ema_short = 9      # Short EMA period
         self.ema_long = 20      # Long EMA period
         self.lookback_candles = 4  # Number of candles to look back for SL
         
-        # Trading hours (IST)
-        self.trading_start = "11:00:00"
-        self.trading_end = "02:30:00"
+        # Trading hours (Eastern Time)
+        self.trading_start = "18:00:00"  # Sunday 6 PM ET
+        self.trading_end = "17:00:00"    # Friday 5 PM ET
+        self.trading_days = [0, 1, 2, 3, 4]  # Monday to Friday (0 = Monday)
         
         # Initialize active trades
         self.active_trades = []
@@ -197,8 +205,31 @@ class BTCTradingBot:
         return None, "No signal"
 
     def calculate_sl_tp(self, signal, df):
-        """Calculate Stop Loss and Take Profit based on previous candles"""
+        """Calculate Stop Loss and Take Profit levels"""
         current_price = df.iloc[-1]['close']
+        prev_low = df.iloc[-2]['low']  # Previous candle's low
+        
+        if signal == 'BUY':
+            # Calculate stop loss (0.25% or previous candle low, whichever is lower)
+            sl_price_percent = current_price * (1 - self.initial_sl_percent)
+            sl_price = min(sl_price_percent, prev_low)
+            
+            # Calculate take profit levels
+            tp1_price = current_price * (1 + self.tp1_percent)  # 0.25% TP for 0.40 lots
+            tp2_price = current_price * (1 + self.tp2_percent)  # 0.50% TP for 0.20 lots
+            tp3_price = current_price * (1 + self.tp3_percent)  # 0.75% TP for 0.20 lots
+            
+        else:  # SELL
+            # Calculate stop loss (0.25% or previous candle high, whichever is higher)
+            sl_price_percent = current_price * (1 + self.initial_sl_percent)
+            sl_price = max(sl_price_percent, df.iloc[-2]['high'])
+            
+            # Calculate take profit levels
+            tp1_price = current_price * (1 - self.tp1_percent)  # 0.25% TP for 0.40 lots
+            tp2_price = current_price * (1 - self.tp2_percent)  # 0.50% TP for 0.20 lots
+            tp3_price = current_price * (1 - self.tp3_percent)  # 0.75% TP for 0.20 lots
+        
+        return sl_price, tp1_price, tp2_price, tp3_price
         
         # Get the last 4 candles (current + 3 previous)
         last_candles = df.iloc[-4:]
@@ -229,27 +260,22 @@ class BTCTradingBot:
     def execute_trade(self, signal, df):
         """Execute a trade based on the signal"""
         current_price = df.iloc[-1]['close']
-        sl_price, tp_price = self.calculate_sl_tp(signal, df)
+        sl_price, tp1_price, tp2_price, tp3_price = self.calculate_sl_tp(signal, df)
         
-        # Calculate lot size
-        lot_size = self.lot_size
-        
-        # Prepare the trade request
+        # Prepare the trade request for full lot size
         symbol_info = mt5.symbol_info(self.symbol)
         if symbol_info is None:
             self.console.print(f"[red]Failed to get symbol info for {self.symbol}[/red]")
             return False
             
-        point = symbol_info.point
-        
+        # Place a single order with full lot size
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": self.symbol,
-            "volume": lot_size,
+            "volume": self.lot_size,  # Full 1.0 lot
             "type": mt5.ORDER_TYPE_BUY if signal == "BUY" else mt5.ORDER_TYPE_SELL,
             "price": current_price,
             "sl": sl_price,
-            "tp": tp_price,
             "deviation": 20,
             "magic": 234000,
             "comment": f"Python trade: {signal}",
@@ -257,18 +283,19 @@ class BTCTradingBot:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
         
-        # Store additional trade details for trailing
+        # Store trade management details
         trade_details = {
-            'ticket': None,  # Will be set after order execution
+            'ticket': None,
             'type': signal,
             'entry_price': current_price,
             'sl': sl_price,
-            'tp': tp_price,
-            'initial_sl': sl_price,  # Keep track of initial SL
-            'initial_tp': tp_price,  # Keep track of initial TP
-            'highest_price': current_price if signal == "BUY" else float('-inf'),
-            'lowest_price': current_price if signal == "SELL" else float('inf'),
-            'volume': lot_size
+            'initial_sl': sl_price,
+            'tp1': tp1_price,    # 0.25% TP for 0.40 lots
+            'tp2': tp2_price,    # 0.50% TP for 0.20 lots
+            'tp3': tp3_price,    # 0.75% TP for 0.20 lots
+            'volume': self.lot_size,
+            'remaining_volume': self.lot_size,
+            'exits_triggered': [False, False, False]  # Track which exits have been triggered
         }
         
         # Send order to MT5
@@ -277,32 +304,68 @@ class BTCTradingBot:
             self.console.print(f"[red]Order failed, retcode={result.retcode}[/red]")
             return False
             
-        trade_details['ticket'] = result.order  # Store the ticket number
-        self.active_trades.append(trade_details)  # Store trade details for trailing
+        trade_details['ticket'] = result.order
+        self.active_trades.append(trade_details)
         
-        self.console.print(f"[green]✓ {signal} order placed successfully[/green]")
+        self.console.print(f"[green]✓ {signal} order placed successfully for {self.lot_size} lots[/green]")
+        self.console.print("Take Profit Levels:")
+        self.console.print(f"TP1: {tp1_price} (0.40 lots at 0.25% profit)")
+        self.console.print(f"TP2: {tp2_price} (0.20 lots at 0.50% profit)")
+        self.console.print(f"TP3: {tp3_price} (0.20 lots at 0.75% profit)")
+        self.console.print(f"Remaining 0.20 lots will use trailing stop")
+        
         return True
 
     def check_exit_conditions(self, df):
-        """Check if any exit conditions are met"""
+        """Check if any exit conditions are met and manage partial exits"""
         if not self.active_trades:
             return False, None
             
         trade = self.active_trades[0]
-        last_row = df.iloc[-1]
+        current_price = mt5.symbol_info_tick(self.symbol).last
         
-        exit_reason = None
-        should_exit = False
+        # Calculate profit percentage
+        if trade['type'] == "BUY":
+            profit_percent = (current_price - trade['entry_price']) / trade['entry_price']
+        else:  # SELL
+            profit_percent = (trade['entry_price'] - current_price) / trade['entry_price']
         
-        # Check EMA cross for exit
-        if trade['type'] == "BUY" and last_row['ema_short'] < last_row['ema_long']:
-            should_exit = True
-            exit_reason = f"EMA cross bearish at {last_row['close']:.2f}"
-        elif trade['type'] == "SELL" and last_row['ema_short'] > last_row['ema_long']:
-            should_exit = True
-            exit_reason = f"EMA cross bullish at {last_row['close']:.2f}"
+        # Check for partial exits
+        if not trade['exits_triggered'][0] and profit_percent >= 0.0025:  # 0.25% profit
+            self.close_partial_position(trade, 0.4, "TP1 at 0.25% profit")
+            trade['exits_triggered'][0] = True
+            
+        elif not trade['exits_triggered'][1] and profit_percent >= 0.0050:  # 0.50% profit
+            self.close_partial_position(trade, 0.2, "TP2 at 0.50% profit")
+            trade['exits_triggered'][1] = True
+            
+        elif not trade['exits_triggered'][2] and profit_percent >= 0.0075:  # 0.75% profit
+            self.close_partial_position(trade, 0.2, "TP3 at 0.75% profit")
+            trade['exits_triggered'][2] = True
+            # After this, only 0.20 lots remain for trailing stop
+            
+            # Move stop loss to entry price when 0.75% profit is reached
+            if trade['sl'] != trade['entry_price']:
+                self.modify_position_sl(trade['ticket'], trade['entry_price'])
+                trade['sl'] = trade['entry_price']
         
-        return should_exit, exit_reason
+        # Manage trailing stop for remaining position after 0.75% profit
+        if all(trade['exits_triggered']) and profit_percent >= 0.0075:
+            steps_above_activation = (profit_percent - 0.0075) / 0.0025  # Every 0.25% move
+            if steps_above_activation > 0:
+                sl_steps = int(steps_above_activation)
+                if trade['type'] == "BUY":
+                    new_sl = trade['entry_price'] * (1 + (sl_steps * 0.0025))
+                    if new_sl > trade['sl']:
+                        self.modify_position_sl(trade['ticket'], new_sl)
+                        trade['sl'] = new_sl
+                else:  # SELL
+                    new_sl = trade['entry_price'] * (1 - (sl_steps * 0.0025))
+                    if new_sl < trade['sl']:
+                        self.modify_position_sl(trade['ticket'], new_sl)
+                        trade['sl'] = new_sl
+        
+        return False, None  # Don't use EMA cross for exit
 
     def display_bot_status(self):
         """Display comprehensive bot status"""
@@ -540,25 +603,98 @@ class BTCTradingBot:
             self.console.print(f"[red]Error displaying market status: {str(e)}[/red]")
 
     def get_active_trades(self):
-        """Retrieve active trades from MT5"""
+        """Retrieve active trades from MT5 and manage trailing stops"""
         try:
-            self.active_trades = mt5.positions_get(symbol=self.symbol) or []
+            positions = mt5.positions_get(symbol=self.symbol)
+            if positions is None:
+                self.active_trades = []
+                return []
+            
+            # Update trailing stops for positions
+            for position in positions:
+                if "(Trailing)" in position.comment:
+                    self.manage_trailing_stop(position)
+            
+            self.active_trades = list(positions)
             return self.active_trades
+            
         except Exception as e:
             self.console.print(f"[red]Error getting active trades: {str(e)}[/red]")
             self.active_trades = []
             return []
+            
+    def manage_trailing_stop(self, position):
+        """Manage trailing stop loss for a position"""
+        current_price = mt5.symbol_info_tick(self.symbol).last
+        entry_price = position.price_open
+        current_sl = position.sl
+        
+        # Calculate profit percentage
+        if position.type == mt5.POSITION_TYPE_BUY:
+            profit_percent = (current_price - entry_price) / entry_price
+            
+            # Move SL to breakeven at 0.75% profit
+            if profit_percent >= self.trailing_activation_percent and current_sl < entry_price:
+                self.modify_position_sl(position.ticket, entry_price)
+            
+            # After breakeven, move SL up every 0.25% profit
+            elif profit_percent >= self.trailing_activation_percent:
+                steps_above_activation = (profit_percent - self.trailing_activation_percent) / self.trailing_step_percent
+                if steps_above_activation > 0:
+                    sl_steps = int(steps_above_activation)
+                    new_sl = entry_price * (1 + (sl_steps * self.trailing_step_percent))
+                    if new_sl > current_sl:
+                        self.modify_position_sl(position.ticket, new_sl)
+                        
+        else:  # SELL position
+            profit_percent = (entry_price - current_price) / entry_price
+            
+            # Move SL to breakeven at 0.75% profit
+            if profit_percent >= self.trailing_activation_percent and current_sl > entry_price:
+                self.modify_position_sl(position.ticket, entry_price)
+            
+            # After breakeven, move SL down every 0.25% profit
+            elif profit_percent >= self.trailing_activation_percent:
+                steps_above_activation = (profit_percent - self.trailing_activation_percent) / self.trailing_step_percent
+                if steps_above_activation > 0:
+                    sl_steps = int(steps_above_activation)
+                    new_sl = entry_price * (1 - (sl_steps * self.trailing_step_percent))
+                    if new_sl < current_sl:
+                        self.modify_position_sl(position.ticket, new_sl)
+                        
+    def modify_position_sl(self, ticket, new_sl):
+        """Modify stop loss for a position"""
+        request = {
+            "action": mt5.TRADE_ACTION_SLTP,
+            "position": ticket,
+            "sl": new_sl
+        }
+        result = mt5.order_send(request)
+        if result.retcode != mt5.TRADE_RETCODE_DONE:
+            self.console.print(f"[red]Failed to modify SL. Error code: {result.retcode}[/red]")
 
     def is_trading_hours(self):
-        """Check if current time is within trading hours (IST)"""
-        ist = pytz.timezone('Asia/Kolkata')
-        current_time = datetime.now(ist).strftime('%H:%M:%S')
-        self.console.print(f"Current time: {current_time}")
+        """Check if current time is within trading hours (Eastern Time)"""
+        et = pytz.timezone('America/New_York')
+        current_time = datetime.now(et)
+        current_weekday = current_time.weekday()  # 0 = Monday, 6 = Sunday
         
-        # Handle overnight trading hours (11:00 AM to 02:30 AM next day)
-        if self.trading_start <= current_time or current_time <= self.trading_end:
+        # Format just the time part for comparison
+        current_time_str = current_time.strftime('%H:%M:%S')
+        
+        # Special handling for Sunday (weekday 6) and Friday (weekday 4)
+        if current_weekday == 6:  # Sunday
+            # Only trade after 6 PM
+            return current_time_str >= self.trading_start
+        elif current_weekday == 4:  # Friday
+            # Only trade until 5 PM
+            return current_time_str <= self.trading_end
+        elif current_weekday == 5:  # Saturday
+            # No trading on Saturday
+            return False
+        else:  # Monday to Thursday
+            # Trade all day
             return True
-        return False
 
     def log_trade(self, trade_details):
         """Log trade details for analysis"""
