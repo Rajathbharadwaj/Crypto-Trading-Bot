@@ -1,0 +1,10 @@
+ccxt==4.1.13  # For multi-exchange support
+websockets==12.0  # For real-time data streaming
+aiohttp==3.9.1   # For async HTTP requests
+pandas==2.1.4    # For data analysis
+numpy==1.24.3    # For numerical computations
+python-binance==1.0.19  # Binance API
+python-telegram-bot==20.7  # For notifications
+newsapi-python==0.2.7  # For news monitoring
+tweepy==4.14.0   # For Twitter API
+redis==5.0.1     # For high-speed caching

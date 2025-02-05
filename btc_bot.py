@@ -11,7 +11,7 @@ import os
 import json
 
 class BTCTradingBot:
-    def __init__(self, timeframe=mt5.TIMEFRAME_M15, name="BTCBot"):
+    def __init__(self, timeframe=mt5.TIMEFRAME_H1, name="BTCBot"):
         self.name = name
         self.timeframe = timeframe
         self.running = True
@@ -19,7 +19,7 @@ class BTCTradingBot:
         self.symbol = "BTCUSD"
         
         # Load saved state or initialize new state
-        self.state_file = "bot_state.json"
+        self.state_file = "bot_state_1hr.json"
         self.load_state()
         
         # State tracking variables
@@ -27,11 +27,9 @@ class BTCTradingBot:
         self.crossover_type = None  # "BUY" or "SELL"
         self.crossover_price = None
         self.crossover_price_index = -1
-        self.confirmation_window = 5  # Max 
         # Trading configuration
         self.lot_size = 0.5     # Fixed lot size
-        self.trade_taken = False
-        self.min_cross_distance = 0.005  # 0.5% minimum distance
+        self.min_cross_distance = 0.0015  # 0.5% minimum distance
         self.confirmation_period = 2
         self.rr_ratio = 3.0
         # Trailing stop configuration
@@ -43,7 +41,7 @@ class BTCTradingBot:
         # Strategy Parameters
         self.ema_short = 9      # Short EMA period
         self.ema_long = 20      # Long EMA period
-        self.lookback_candles = 3  # Number of candles to look back for SL
+        self.lookback_candles = 4  # Number of candles to look back for SL
         
         # Trading hours (IST)
         self.trading_start = "11:00:00"
@@ -177,51 +175,24 @@ class BTCTradingBot:
             self.console.print("[yellow]❌ No new trades: Active trade exists[/yellow]")
             return None, "Active trade exists"
             
-        # Check if crossover was previously detected
-        if self.crossover_detected:
-            price_move_pct = abs(current_price - self.crossover_price) / self.crossover_price
-            price_move_value = abs(current_price - self.crossover_price)
-            trend_aligned = (
-                (self.crossover_type == "BUY" and current_price > self.crossover_price) or
-                (self.crossover_type == "SELL" and current_price < self.crossover_price)
-            )
+        # Check for new crossover
+        buy_cross = (prev_ema_diff < 0 and current_ema_diff > 0)
+        sell_cross = (prev_ema_diff > 0 and current_ema_diff < 0)
             
-            self.console.print(f"\n=== Crossover Follow-up ===")
-            self.console.print(f"Type: {self.crossover_type}")
-            self.console.print(f"Entry Price: ${self.crossover_price:.2f}")
-            self.console.print(f"Price Move: ${price_move_value:.2f} ({price_move_pct*100:.3f}%)")
-            self.console.print(f"Required: ${required_movement:.2f} ({self.min_cross_distance*100:.3f}%)")
-            self.console.print(f"Trend Aligned: {'[green]Yes[/green]' if trend_aligned else '[red]No[/red]'}")
-            
-            if not trend_aligned:
-                self.console.print("[red]❌ Price moving against crossover direction[/red]")
-            elif price_move_pct < self.min_cross_distance:
-                self.console.print(f"[yellow]⌛ Waiting for {self.min_cross_distance*100:.3f}% move[/yellow]")
+        self.console.print("\n=== Crossover Detection ===")
+        if not (buy_cross or sell_cross):
+            if current_ema_diff > 0:
+                self.console.print("[yellow]⌛ EMA9 above EMA20 - Waiting for crossover[/yellow]")
             else:
-                self.console.print(f"[green]✓ Movement requirement met[/green]")
-                signal = self.crossover_type
-                self._reset_crossover_state()
-                return signal, f"Price moved {price_move_pct*100:.2f}% since crossover"
-                
+                self.console.print("[yellow]⌛ EMA9 below EMA20 - Waiting for crossover[/yellow]")
         else:
-            # Check for new crossover
-            buy_cross = (prev_ema_diff < 0 and current_ema_diff > 0)
-            sell_cross = (prev_ema_diff > 0 and current_ema_diff < 0)
-            
-            self.console.print("\n=== Crossover Detection ===")
-            if not (buy_cross or sell_cross):
-                if current_ema_diff > 0:
-                    self.console.print("[yellow]⌛ EMA9 above EMA20 - Waiting for crossover[/yellow]")
-                else:
-                    self.console.print("[yellow]⌛ EMA9 below EMA20 - Waiting for crossover[/yellow]")
-            else:
-                self.crossover_detected = True
-                self.crossover_type = "BUY" if buy_cross else "SELL"
-                self.crossover_price = current_price
-                self.crossover_price_index = len(df) - 1
-                self.save_state()
-                self.console.print(f"[green]✓ {self.crossover_type} Crossover Detected![/green]")
-                return None, "Crossover detected - awaiting confirmation"
+            self.crossover_detected = True
+            self.crossover_type = "BUY" if buy_cross else "SELL"
+            self.crossover_price = current_price
+            self.crossover_price_index = len(df) - 1
+            self.save_state()
+            self.console.print(f"[green]✓ {self.crossover_type} Crossover Detected![/green]")
+            return None, "Crossover detected - awaiting confirmation"
         
         return None, "No signal"
 
@@ -314,14 +285,10 @@ class BTCTradingBot:
 
     def check_exit_conditions(self, df):
         """Check if any exit conditions are met"""
-        if not self.trade_taken:
+        if not self.active_trades:
             return False, None
             
-        active_trades = self.get_active_trades()
-        if not active_trades:
-            return False, None
-            
-        trade = active_trades[0]
+        trade = self.active_trades[0]
         last_row = df.iloc[-1]
         
         exit_reason = None
@@ -396,7 +363,7 @@ class BTCTradingBot:
                         self.close_trade(trade, exit_reason)
                     
                 # If no active trade, check for entry signals
-                elif not self.trade_taken:
+                else:
                     signal, reason = self.get_trading_signal(df)
                     if signal:
                         self.execute_trade(signal, df)
@@ -419,7 +386,7 @@ class BTCTradingBot:
                 self.console.print("[red]Failed to get current price[/red]")
                 return False
             
-            close_price = tick.bid if position.type == 0 else tick.ask
+            close_price = tick.bid if position.type == 1 else tick.ask
             profit_pips = close_price - position.price_open  # For BTC, 1 pip = $1
             if position.type == 1:
                 profit_pips = -profit_pips
@@ -460,7 +427,7 @@ class BTCTradingBot:
             if result.retcode == mt5.TRADE_RETCODE_DONE:
                 self.console.print("[green]Trade closed successfully![/green]")
                 self.console.print(f"Profit: ${position.profit:.2f} ({profit_pips:.1f} pips)")
-                self.trade_taken = False
+                self._reset_crossover_state()  # Reset crossover state after trade closure
                 return True
             else:
                 self.console.print(f"[red]Failed to close trade: {result.comment} (code: {result.retcode})[/red]")
