@@ -194,13 +194,24 @@ class BTCTradingBot:
             else:
                 self.console.print("[yellow]⌛ EMA9 below EMA20 - Waiting for crossover[/yellow]")
         else:
-            self.crossover_detected = True
-            self.crossover_type = "BUY" if buy_cross else "SELL"
-            self.crossover_price = current_price
-            self.crossover_price_index = len(df) - 1
-            self.save_state()
-            self.console.print(f"[green]✓ {self.crossover_type} Crossover Detected![/green]")
-            return None, "Crossover detected - awaiting confirmation"
+            # If crossover was just detected
+            if not self.crossover_detected:
+                self.crossover_detected = True
+                self.crossover_type = "BUY" if buy_cross else "SELL"
+                self.crossover_price = current_price
+                self.crossover_price_index = len(df) - 1
+                self.save_state()
+                self.console.print(f"[green]✓ {self.crossover_type} Crossover Detected! Waiting for next candle to enter.[/green]")
+                return None, "Crossover detected - awaiting next candle"
+            
+            # If crossover was detected in previous candle, place the trade
+            elif self.crossover_detected and len(df) > self.crossover_price_index + 1:
+                signal = self.crossover_type
+                self._reset_crossover_state()  # Reset for next signal
+                self.console.print(f"[green]✓ Placing {signal} trade at candle open.[/green]")
+                return signal, "Placing trade at new candle open"
+            
+            return None, "Waiting for next candle"
         
         return None, "No signal"
 
