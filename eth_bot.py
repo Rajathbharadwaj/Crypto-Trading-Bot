@@ -10,16 +10,16 @@ import pytz
 import os
 import json
 
-class BTCTradingBot:
-    def __init__(self, timeframe=mt5.TIMEFRAME_M15, name="BTCBot"):
+class ETHTradingBot:
+    def __init__(self, timeframe=mt5.TIMEFRAME_M15, name="ETHBot"):
         self.name = name
         self.timeframe = timeframe
         self.running = True
         self.console = Console()
-        self.symbol = "BTCUSD"
+        self.symbol = "ETHUSD"
         
         # Load saved state or initialize new state
-        self.state_file = "bot_state.json"
+        self.state_file = "eth_state.json"
         self.load_state()
         
         # State tracking variables
@@ -41,7 +41,7 @@ class BTCTradingBot:
         self.partial_lots = [0.50, 0.20, 0.20, 0.10]  # Lot sizes for each exit
         
         # Stop Loss and Trailing configuration
-        self.initial_sl_percent = 0.0025  # 0.25% initial stop loss
+        self.initial_sl_percent = 0.003  # 0.3% initial stop loss
         self.trailing_enabled = True
         self.trailing_activation_percent = 0.0075  # Activate at 0.75% profit
         self.trailing_start_percent = 0.005  # Move SL to 0.5% above entry
@@ -275,7 +275,7 @@ class BTCTradingBot:
                 
                 if is_valid:
                     signal = self.crossover_type
-                    self.console.print(f"[green]✓ {signal} TRADE WILL BE PLACED: This is the next candle after crossover and EMAs are still valid[/green]")
+                    self.console.print(f"[green]✓ {signal} TRADE WILL BE PLACED: This is the next candle after crossover with confirmed EMA positions[/green]")
                     return signal, "Executing on next candle after crossover with confirmed EMA positions"
                 else:
                     self.console.print("[yellow]Crossover signal invalidated due to EMA position change. Resetting state.[/yellow]")
@@ -545,7 +545,7 @@ class BTCTradingBot:
 
     def run(self):
         """Main bot loop with status display"""
-        self.console.print("[bold green]Starting BTC Trading Bot...[/bold green]")
+        self.console.print("[bold green]Starting ETH Trading Bot...[/bold green]")
         
         # Track the last processed candle time to detect new candles
         last_candle_time = None
@@ -1232,4 +1232,8 @@ class BTCTradingBot:
             self.console.print("[red]Failed to get current price[/red]")
             return None
         
+        # Fix to handle empty active_trades list
+        if not self.active_trades:
+            return (tick.ask + tick.bid) / 2  # Return the mid price if no active trades
+            
         return tick.ask if self.active_trades[0].type == 0 else tick.bid
