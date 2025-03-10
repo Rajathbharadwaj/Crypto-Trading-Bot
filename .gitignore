@@ -41,3 +41,5 @@ credentials.json
 # MT5 specific
 *.dat
 *.hst 
+# Environment variables
+.env
