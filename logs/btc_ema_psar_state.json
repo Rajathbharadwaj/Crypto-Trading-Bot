@@ -1,0 +1,33 @@
+{
+  "crossover_detected": true,
+  "crossover_type": null,
+  "crossover_price": 81262.09,
+  "crossover_time": 1741568122.7354596,
+  "partial_exits_taken": {
+    "1527334493": [
+      {
+        "exit_percentage": 0.3,
+        "time": "2025-03-09T20:55:21.527959",
+        "reason": "0.3% Partial Take Profit"
+      }
+    ],
+    "1527666835": [
+      {
+        "exit_percentage": 0.3,
+        "time": "2025-03-09T21:02:10.384845",
+        "reason": "Migrated from legacy format"
+      },
+      {
+        "exit_percentage": 0.5,
+        "time": "2025-03-09T21:02:14.388694",
+        "reason": "0.5% Partial Take Profit"
+      }
+    ]
+  },
+  "last_psar_direction": null,
+  "psar_direction_changed": false,
+  "psar_direction_change_time": null,
+  "counter_trend_positions": {},
+  "counter_trend_active": false,
+  "last_counter_trend_check": 0
+}

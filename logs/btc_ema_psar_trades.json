@@ -1,0 +1,1111 @@
+[
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1523915713,
+    "volume": 0.1,
+    "entryPrice": 85407.26,
+    "boughtAt": 86452.2,
+    "profit": -104.49,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T01:04:42.290078"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524193484,
+    "entryPrice": 86441.79,
+    "stopLoss": 84807.34,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.26%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 86701.12,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 86874.0,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 87046.88,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T01:05:03.994417"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1524193484,
+    "volume": 0.1,
+    "entryPrice": 86442.28,
+    "soldAt": 85907.25,
+    "profit": -54.08,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T04:54:02.750633"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1524459669,
+    "entryPrice": 85914.91,
+    "stopLoss": 86637.32,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.56%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 85657.17,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 85485.34,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 85313.51,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T04:54:04.420812"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1524459669,
+    "volume": 0.1,
+    "entryPrice": 85914.91,
+    "boughtAt": 86288.68,
+    "profit": -39.9,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T07:35:05.011704"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524695432,
+    "entryPrice": 86355.02,
+    "stopLoss": 85522.29,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "0.64%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 86614.09,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 86786.8,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 86959.51,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T07:45:05.379019"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524695432,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 86354.86,
+    "soldAt": 86629.2,
+    "profit": 8.229,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T09:41:21.254653"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525016691,
+    "entryPrice": 85943.29,
+    "stopLoss": 86990.32,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.81%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 85685.46,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 85513.57,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 85341.69,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T11:30:01.113908"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525016691,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 85943.53,
+    "boughtAt": 85668.48,
+    "profit": 8.25,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T12:18:03.652325"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525120444,
+    "entryPrice": 85858.73,
+    "stopLoss": 86797.14,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.73%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 85601.15,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 85429.44,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 85257.72,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T12:18:58.289242"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525120444,
+    "volume": 0.1,
+    "entryPrice": 85841.48,
+    "boughtAt": 86080.61,
+    "profit": -24.1,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T14:25:39.518370"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525259179,
+    "entryPrice": 86342.75,
+    "stopLoss": 85355.73,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "0.76%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 86601.78,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 86774.46,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 86947.15,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T14:30:02.455047"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525259179,
+    "volume": 0.1,
+    "entryPrice": 86346.04000000001,
+    "soldAt": 86012.12,
+    "profit": -33.22,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T17:15:02.691298"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525346192,
+    "entryPrice": 86033.98,
+    "stopLoss": 86772.02,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.57%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 85775.88,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 85603.81,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 85431.74,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T17:15:04.775970"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525346192,
+    "volume": 0.1,
+    "entryPrice": 86033.98,
+    "boughtAt": 86445.6,
+    "profit": -41.38,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T19:29:52.416571"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525413860,
+    "entryPrice": 86429.64,
+    "stopLoss": 85861.45,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "0.44%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 86688.93,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 86861.79,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 87034.65,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T19:29:54.115393"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525413860,
+    "volume": 0.1,
+    "entryPrice": 86429.64,
+    "soldAt": 86143.91,
+    "profit": -28.79,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T21:45:12.380313"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525491269,
+    "entryPrice": 86144.37,
+    "stopLoss": 86695.21,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.43%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 85885.94,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 85713.65,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 85541.36,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T21:45:14.060453"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525491269,
+    "volume": 0.1,
+    "entryPrice": 86138.06,
+    "boughtAt": 83170.5,
+    "profit": 292.5,
+    "exitReason": "Take Profit 3 hit (0.7%)",
+    "status": "CLOSED",
+    "timestamp": "2025-03-09T10:10:53.974352"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526425039,
+    "entryPrice": 83186.92,
+    "stopLoss": 85113.59,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.54%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82937.36,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82770.99,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 82604.61,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T10:10:55.645444"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526425201,
+    "entryPrice": 83186.92,
+    "stopLoss": 85113.59,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.54%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82937.36,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82770.99,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 82604.61,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T10:10:56.111314"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526425201,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 83123.14,
+    "boughtAt": 82899.73,
+    "profit": 7.946999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T11:46:24.633275"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526653826,
+    "entryPrice": 83010.22,
+    "stopLoss": 84153.95,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.92%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82761.19,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82595.17,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 82429.15,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T11:47:27.832507"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526653826,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 82999.95,
+    "boughtAt": 82729.4,
+    "profit": 8.117999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:08:21.134456"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526709812,
+    "entryPrice": 82920.06,
+    "stopLoss": 84077.62,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.93%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82671.3,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82505.46,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 82339.62,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:08:44.275760"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526709812,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 82930.07,
+    "boughtAt": 82667.39,
+    "profit": 7.880999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:38:59.295726"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526709812,
+    "exitPortion": 0.3,
+    "volume": 0.02,
+    "entryPrice": 82930.07,
+    "boughtAt": 82506.61,
+    "profit": 8.405714285714286,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:39:10.005490"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526805464,
+    "entryPrice": 82678.99,
+    "stopLoss": 83392.32,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.58%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82430.95,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82265.6,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 82100.24,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:39:15.838746"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526805464,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 82648.0,
+    "boughtAt": 82399.71,
+    "profit": 7.448999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:52:37.942060"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526844987,
+    "entryPrice": 82560.91,
+    "stopLoss": 83827.18,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.02%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82313.23,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82148.11,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 81982.98,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:53:02.215031"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526844987,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 82536.65000000001,
+    "boughtAt": 82285.94,
+    "profit": 7.523999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:21:54.122319"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526926566,
+    "entryPrice": 82446.85,
+    "stopLoss": 83019.59,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.46%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82199.51,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 82034.62,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 81869.72,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T13:29:01.133638"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1526926566,
+    "volume": 0.1,
+    "entryPrice": 82449.56,
+    "boughtAt": 82866.65,
+    "profit": -41.75,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-09T14:10:30.168658"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1527011210,
+    "entryPrice": 82609.92,
+    "stopLoss": 82114.82,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "0.40%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82857.75,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 83022.97,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 83188.19,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:15:01.445572"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527011210,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 82620.72,
+    "soldAt": 82892.92,
+    "profit": 8.165999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:26:19.890915"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527011210,
+    "exitPortion": 0.3,
+    "volume": 0.02,
+    "entryPrice": 82620.72,
+    "soldAt": 83038.67,
+    "profit": 8.36,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:27:50.617484"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1527011210,
+    "volume": 0.05,
+    "entryPrice": 82620.72,
+    "soldAt": 83221.08,
+    "profit": 30.46,
+    "exitReason": "Take Profit 3 hit (0.7%)",
+    "status": "CLOSED",
+    "timestamp": "2025-03-09T14:27:54.105913"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1527046070,
+    "entryPrice": 83040.17,
+    "stopLoss": 81924.74,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "0.90%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 83289.29,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 83455.37,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 83621.45,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:30:01.308304"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527046070,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 83034.17,
+    "soldAt": 83292.15,
+    "profit": 7.74,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:30:53.044730"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1527056700,
+    "entryPrice": 83136.98,
+    "stopLoss": 82176.34,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "0.77%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 83386.39,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 83552.66,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 83718.94,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:35:38.875205"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1527056700,
+    "volume": 0.1,
+    "entryPrice": 83132.64,
+    "soldAt": 82373.99,
+    "profit": -76.05,
+    "exitReason": "Trailing stop (PSAR) hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-09T15:09:36.146442"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527122665,
+    "entryPrice": 82382.42,
+    "stopLoss": 83119.06,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.60%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 82135.27,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 81970.51,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 81805.74,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T15:09:37.827728"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1527195928,
+    "entryPrice": 83304.18,
+    "stopLoss": 82082.96,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "0.98%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 83554.09,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 83720.7,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 83887.31,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T16:15:08.550795"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527195928,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 83291.1,
+    "soldAt": 83559.9,
+    "profit": 8.064,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T16:32:41.640119"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1527217515,
+    "entryPrice": 83397.58,
+    "stopLoss": 82216.78,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "0.94%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 83647.77,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 83814.57,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 83981.36,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T16:34:03.800493"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527334493,
+    "entryPrice": 81930.64,
+    "stopLoss": 83560.4,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "1.33%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 81684.85,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 81520.99,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 81357.13,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T17:56:36.045061"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527482710,
+    "entryPrice": 80416.48,
+    "stopLoss": 83250.54,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "2.35%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 80175.23,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 80014.4,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 79853.56,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T19:10:10.584989"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527334493,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 81931.32,
+    "exitPrice": 80966.26,
+    "profit": 28.95,
+    "exitReason": "0.3% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:12:18.532670"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527334493,
+    "exitPortion": 0.5,
+    "volume": 0.04000000000000001,
+    "entryPrice": 81931.32,
+    "exitPrice": 80975.27,
+    "profit": 38.24000000000001,
+    "exitReason": "0.5% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:12:21.232684"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527334493,
+    "exitPortion": 0.3,
+    "volume": 0.009999999999999998,
+    "entryPrice": 81931.32,
+    "exitPrice": 80967.71,
+    "profit": 9.636666666666667,
+    "exitReason": "0.3% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:14:00.719373"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527334493,
+    "exitPortion": 0.5,
+    "volume": 0.01,
+    "entryPrice": 81931.32,
+    "exitPrice": 80947.68,
+    "profit": 9.84,
+    "exitReason": "0.5% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:14:03.403250"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1527334493,
+    "volume": 0.01,
+    "entryPrice": 81931.32,
+    "exitPrice": 81278.08,
+    "profit": 6.53,
+    "exitReason": "0.3% Partial Take Profit (became full exit)",
+    "status": "FULL_CLOSE",
+    "timestamp": "2025-03-09T20:55:21.514961"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "price": 81262.09,
+    "stopLoss": 80187.01,
+    "riskPercent": 1.32297434330382,
+    "ticket": 1527666835,
+    "tp1": 81505.88,
+    "tp2": 81668.4,
+    "tp3": 81830.92,
+    "lotSize": 0.1,
+    "timestamp": "2025-03-09T20:55:23.165177",
+    "psarDistance": "0.88%",
+    "psarValue": 80045.77,
+    "emaFast": 80986.57647168466,
+    "emaSlow": 81441.79863480548
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527666835,
+    "exitPortion": 0.3,
+    "volume": 0.03,
+    "entryPrice": 81255.59,
+    "exitPrice": 81517.13,
+    "profit": 7.844999999999999,
+    "exitReason": "0.3% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T21:01:43.540991"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527666835,
+    "exitPortion": 0.5,
+    "volume": 0.04000000000000001,
+    "entryPrice": 81255.59,
+    "exitPrice": 81672.9,
+    "profit": 16.691428571428574,
+    "exitReason": "0.5% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T21:02:14.375706"
+  }
+]

@@ -10,8 +10,6 @@ import time
 import os
 import json
 import gc  # Add garbage collection module
-import math
-import random
 
 # Define a custom JSON encoder for NumPy types
 class NumpyEncoder(json.JSONEncoder):
@@ -24,8 +22,6 @@ class NumpyEncoder(json.JSONEncoder):
             return bool(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
-        elif isinstance(obj, datetime):
-            return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
 class BTCEmaPsarBot:
@@ -83,11 +79,6 @@ class BTCEmaPsarBot:
         self.psar_direction_changed = False
         self.psar_direction_change_time = None
         
-        # Add counter-trend tracking
-        self.counter_trend_positions = {}  # Dict to track counter-trend positions by ticket
-        self.counter_trend_active = False  # Flag to track if we have active counter-trend trades
-        self.last_counter_trend_check = 0  # Timestamp of last counter-trend check
-        
         # Load previous state if exists
         self.load_state()
         
@@ -104,10 +95,6 @@ class BTCEmaPsarBot:
         # Initialize MT5
         if not self.initialize_mt5():
             raise Exception("Failed to initialize MT5")
-
-        # Store active symbol - the one we actually use for trading
-        self.active_symbol = None
-        self.alternative_symbols = ["BTCUSDT", "BTC/USD", "BTC"]
 
     def initialize_mt5(self):
         """Initialize connection to MetaTrader 5"""
@@ -134,9 +121,6 @@ class BTCEmaPsarBot:
                     if not os.path.exists(self.log_dir):
                         os.makedirs(self.log_dir)
                     
-                    # Find a valid BTC symbol to use
-                    self._find_valid_btc_symbol()
-                    
                     return True
                 else:
                     error_code = mt5.last_error()
@@ -152,54 +136,6 @@ class BTCEmaPsarBot:
         
         self.console.print("[red]All MT5 login attempts failed![/red]")
         return False
-
-    def _find_valid_btc_symbol(self):
-        """Find a valid BTC symbol that can be used with this broker"""
-        try:
-            # First, check the default symbol
-            self.console.print(f"[dim]Checking if {self.symbol} is available...[/dim]")
-            symbols = mt5.symbols_get()
-            
-            if symbols is None:
-                error_code = mt5.last_error()
-                self.console.print(f"[red]Failed to get symbols. MT5 error code: {error_code}[/red]")
-                return False
-            
-            # Extract symbol names
-            symbol_names = [symbol.name for symbol in symbols]
-            
-            # Add more logging to show available BTC symbols
-            btc_symbols = [name for name in symbol_names if "BTC" in name]
-            self.console.print(f"Available BTC symbols: {btc_symbols}")
-            
-            # First, try the default symbol
-            if self.symbol in symbol_names:
-                # Test that we can get data for this symbol
-                test_data = mt5.copy_rates_from_pos(self.symbol, self.timeframe, 0, 10)
-                if test_data is not None:
-                    self.active_symbol = self.symbol
-                    self.console.print(f"[green]Default symbol {self.symbol} is valid[/green]")
-                    return True
-                else:
-                    self.console.print(f"[yellow]Default symbol {self.symbol} exists but cannot get data[/yellow]")
-            
-            # Try alternative symbols
-            for alt_symbol in self.alternative_symbols:
-                if alt_symbol in symbol_names:
-                    # Test that we can get data for this symbol
-                    test_data = mt5.copy_rates_from_pos(alt_symbol, self.timeframe, 0, 10)
-                    if test_data is not None:
-                        self.active_symbol = alt_symbol
-                        self.console.print(f"[green]Alternative symbol {alt_symbol} is valid[/green]")
-                        return True
-                    else:
-                        self.console.print(f"[yellow]Alternative symbol {alt_symbol} exists but cannot get data[/yellow]")
-            
-            self.console.print("[red]Could not find any working BTC symbol![/red]")
-            return False
-        except Exception as e:
-            self.console.print(f"[red]Error in _find_valid_btc_symbol: {str(e)}[/red]")
-            return False
 
     def calculate_indicators(self, df):
         """Calculate EMA, PSAR, and distance metrics"""
@@ -337,30 +273,6 @@ class BTCEmaPsarBot:
                 except Exception as change_error:
                     self.console.print(f"[yellow]Warning: Error checking PSAR direction change: {str(change_error)}[/yellow]")
                     # Continue anyway, this is not critical
-            
-            # Calculate EMA gap and rate of change metrics for counter-trend trading
-            try:
-                # Calculate the gap between EMAs (absolute value)
-                df['ema_gap'] = abs(df['ema_9'] - df['ema_20'])
-                
-                # Calculate the rate of change (ROC) of the gap over different periods
-                df['ema_gap_roc_1'] = df['ema_gap'].pct_change(1) * 100  # 1-period ROC
-                df['ema_gap_roc_3'] = df['ema_gap'].pct_change(3) * 100  # 3-period ROC
-                
-                # Calculate the acceleration (ROC of the ROC)
-                df['ema_gap_accel'] = df['ema_gap_roc_1'].pct_change(1) * 100
-                
-                # Determine if gap is widening or narrowing (boolean)
-                df['gap_widening'] = df['ema_gap'] > df['ema_gap'].shift(1)
-                
-                # Fill any NaN values that result from calculations
-                for col in ['ema_gap_roc_1', 'ema_gap_roc_3', 'ema_gap_accel']:
-                    df[col] = df[col].fillna(0)
-                
-                self.console.print("[dim]EMA gap and rate of change metrics calculated[/dim]")
-            except Exception as gap_error:
-                self.console.print(f"[yellow]Warning: Error calculating EMA gap metrics: {str(gap_error)}[/yellow]")
-                # Continue anyway, this is not critical
             
             # Force garbage collection after heavy calculations
             gc.collect()
@@ -727,17 +639,6 @@ class BTCEmaPsarBot:
         self.last_mt5_check = time.time()  # Track when we last checked MT5 connection
         self.consecutive_errors = 0  # Track consecutive errors for backoff
         
-        # Make sure we have a valid active symbol
-        if not self._find_valid_btc_symbol():
-            self.console.print("[yellow]Could not find main BTC symbol, attempting to use a placeholder...[/yellow]")
-            
-            # If we can't find a working symbol, set a placeholder but continue
-            self.active_symbol = self.symbol
-            self.console.print(f"[yellow]Using placeholder symbol: {self.active_symbol}[/yellow]")
-            self.console.print("[yellow]Will attempt to work with symbol data even if unavailable in broker[/yellow]")
-        else:
-            self.console.print(f"[green]Using symbol: {self.active_symbol}[/green]")
-        
         # For debugging: add a main loop counter
         loop_count = 0
         
@@ -825,62 +726,14 @@ class BTCEmaPsarBot:
                             self.console.print(f"[dim]Checking exit conditions for position #{position.ticket}...[/dim]")
                             
                             # Check exit conditions but don't terminate the process
-                            # check_exit_conditions now returns tuple: (action_type, exit_portion, reason)
-                            exit_result = self.check_exit_conditions(df, position)
+                            # check_exit_conditions now returns bool to indicate if an action was taken
+                            action_executed = self.check_exit_conditions(df, position)
                             
                             # Log the result of checking exit conditions
-                            self.console.print(f"[dim]Exit check result: exit_result = {exit_result}[/dim]")
-                            
-                            action_taken = False
-                            if exit_result[0] is not None:
-                                action_type, exit_portion, reason = exit_result
-                                
-                                if action_type == "PARTIAL_EXIT":
-                                    self.console.print(f"[yellow]Executing partial exit ({exit_portion*100}%) due to: {reason}[/yellow]")
-                                    exit_success = self.execute_partial_exit(position, exit_portion, reason)
-                                    if exit_success:
-                                        self.console.print("[green]Partial exit executed successfully[/green]")
-                                        
-                                        # Track this partial exit in our internal state
-                                        pos_id = position.ticket
-                                        if pos_id not in self.partial_exits_taken:
-                                            self.partial_exits_taken[pos_id] = []
-                                        
-                                        self.partial_exits_taken[pos_id].append({
-                                            "exit_percentage": exit_portion,
-                                            "time": datetime.now(),
-                                            "reason": reason
-                                        })
-                                        
-                                        self.save_state()  # Save state to persist between restarts
-                                        action_taken = True
-                                    else:
-                                        self.console.print("[red]Partial exit execution failed![/red]")
-                                
-                                elif action_type == "EXIT":
-                                    self.console.print(f"[yellow]Executing full exit due to: {reason}[/yellow]")
-                                    exit_success = self.close_position(position, reason)
-                                    if exit_success:
-                                        self.console.print("[green]Full exit executed successfully[/green]")
-                                        action_taken = True
-                                    else:
-                                        self.console.print("[red]Full exit execution failed![/red]")
-                            
-                            # If no action was taken for the main position, check for counter-trend opportunities
-                            if not action_taken:
-                                counter_signal = self.check_for_counter_trend_opportunity(df, position)
-                                
-                                if counter_signal:
-                                    self.console.print(f"[bold]Detected counter-trend {counter_signal} opportunity against position #{position.ticket}[/bold]")
-                                    counter_result = self.execute_counter_trend_trade(counter_signal, df, position)
-                                    
-                                    if counter_result:
-                                        self.console.print(f"[green]Successfully executed counter-trend {counter_signal} trade[/green]")
-                                    else:
-                                        self.console.print(f"[yellow]Failed to execute counter-trend {counter_signal} trade[/yellow]")
+                            self.console.print(f"[dim]Exit check result: action_executed = {action_executed}[/dim]")
                             
                             # Log any actions that were taken
-                            if action_taken:
+                            if action_executed:
                                 self.console.print("[green]Exit condition checked and handled[/green]")
                                 
                                 # Refresh positions after an action to get the latest state
@@ -923,10 +776,6 @@ class BTCEmaPsarBot:
                 
                 # Reset consecutive errors counter on successful execution
                 self.consecutive_errors = 0
-                
-                # Check and update counter-trend positions status
-                if self.counter_trend_active:
-                    self.check_counter_trend_positions()
                 
                 # Sleep for a short time to avoid hammering the system
                 self.console.print("[dim]Sleeping before next iteration...[/dim]")
@@ -984,62 +833,14 @@ class BTCEmaPsarBot:
             # Force garbage collection before fetching data
             gc.collect()
             
-            # Make sure we're using the active symbol that works
-            if self.active_symbol is None:
-                if not self._find_valid_btc_symbol():
-                    # If we still can't find a working symbol, use the default symbol but warn
-                    self.active_symbol = self.symbol
-                    self.console.print(f"[yellow]Using default symbol {self.active_symbol} despite issues[/yellow]")
-                    
-            symbol_to_use = self.active_symbol
-            self.console.print(f"[dim]Using symbol: {symbol_to_use}[/dim]")
-            
             # Request a reduced amount of data to prevent memory issues
             # 2000 candles should be more than enough for PSAR and EMA calculations
-            rates = mt5.copy_rates_from_pos(symbol_to_use, self.timeframe, 0, 2000)
+            rates = mt5.copy_rates_from_pos(self.symbol, self.timeframe, 0, 2000)  # Reduced from 5000
             
             if rates is None:
-                error_code = mt5.last_error()
-                self.console.print(f"[red]Failed to get market data. MT5 error code: {error_code}[/red]")
-                
-                # If we can't get data for the active symbol, try a test symbol to check connection
-                test_symbol = "EURUSD"  # This is almost always available
-                test_rates = mt5.copy_rates_from_pos(test_symbol, self.timeframe, 0, 10)
-                
-                if test_rates is not None:
-                    self.console.print(f"[yellow]Connection works with {test_symbol} but {symbol_to_use} is unavailable[/yellow]")
-                    
-                    # Create a synthetic empty dataframe with minimal required columns for testing
-                    self.console.print("[yellow]Creating synthetic data for testing purposes[/yellow]")
-                    
-                    # Create a minimal synthetic dataframe for testing purposes
-                    now = datetime.now()
-                    synthetic_data = []
-                    
-                    for i in range(200):  # Create 200 candles
-                        candle_time = now - timedelta(minutes=15 * i)
-                        # Simple oscillation around 65000 for testing
-                        close_price = 65000 + 500 * math.sin(i / 10)
-                        # Create some variation in high/low
-                        high_price = close_price + random.uniform(50, 150)
-                        low_price = close_price - random.uniform(50, 150)
-                        synthetic_data.append({
-                            'time': candle_time.timestamp(),
-                            'open': close_price - random.uniform(-100, 100),
-                            'high': high_price,
-                            'low': low_price,
-                            'close': close_price,
-                            'tick_volume': random.randint(100, 1000)
-                        })
-                    
-                    # Convert to dataframe
-                    df = pd.DataFrame(synthetic_data)
-                    df['time'] = pd.to_datetime(df['time'], unit='s')
-                    
-                    self.console.print("[yellow]Created synthetic data for testing[/yellow]")
-                    return df
-                
-                return None
+                    error_code = mt5.last_error()
+                    self.console.print(f"[red]Failed to get market data. MT5 error code: {error_code}[/red]")
+                    return None
             
             self.console.print(f"[dim]Received {len(rates)} candles from MT5[/dim]")
                 
@@ -1105,32 +906,13 @@ class BTCEmaPsarBot:
             last_row = df.iloc[-1]
             
             # Get current price for entry
-            symbol_to_use = self.active_symbol or self.symbol
-            tick_info = mt5.symbol_info_tick(symbol_to_use)
-            
-            if tick_info is None:
-                self.console.print(f"[red]Could not get tick information for {symbol_to_use}[/red]")
-                return False
-                
-            price = tick_info.ask if signal == "BUY" else tick_info.bid
+            price = mt5.symbol_info_tick(self.symbol).ask if signal == "BUY" else mt5.symbol_info_tick(self.symbol).bid
             
             # Calculate PSAR-based stop loss distance (1.5x the PSAR distance for safety)
             sl_distance_pct = last_row['psar_distance'] * 1.5
             
-            # Ensure minimum SL distance is at least 1%
-            sl_distance_pct = max(sl_distance_pct, 1.0)
-            
-            # Make sure SL distance is positive
-            sl_distance_pct = abs(sl_distance_pct)
-            
-            # Calculate stop loss price - ALWAYS place SL in the correct direction
-            if signal == "BUY":
-                # For BUY orders, SL must be BELOW entry price
-                sl_price = price * (1 - sl_distance_pct/100)
-            else:  # SELL
-                # For SELL orders, SL must be ABOVE entry price
-                sl_price = price * (1 + sl_distance_pct/100)
-                
+            # Calculate stop loss price
+            sl_price = price * (1 - sl_distance_pct/100) if signal == "BUY" else price * (1 + sl_distance_pct/100)
             sl_price = round(sl_price, 2)  # Round to 2 decimal places
             
             # Calculate multiple exit points (percentage-based)
@@ -1146,18 +928,6 @@ class BTCEmaPsarBot:
             tp1_price = round(tp1_price, 2)
             tp2_price = round(tp2_price, 2)
             tp3_price = round(tp3_price, 2)
-            
-            # Double-check that SL is in the correct direction relative to entry price
-            if signal == "BUY" and sl_price >= price:
-                self.console.print(f"[red]Error: Stop loss ({sl_price}) must be below entry price ({price}) for BUY orders[/red]")
-                # Correct the stop loss to be below entry price
-                sl_price = price * 0.99  # Set SL 1% below entry price
-                self.console.print(f"[yellow]Corrected stop loss to {sl_price:.2f}[/yellow]")
-            elif signal == "SELL" and sl_price <= price:
-                self.console.print(f"[red]Error: Stop loss ({sl_price}) must be above entry price ({price}) for SELL orders[/red]")
-                # Correct the stop loss to be above entry price
-                sl_price = price * 1.01  # Set SL 1% above entry price
-                self.console.print(f"[yellow]Corrected stop loss to {sl_price:.2f}[/yellow]")
             
             # Display the trade setup
             self.console.print("[bold cyan]Trade Setup:[/bold cyan]")
@@ -1180,14 +950,14 @@ class BTCEmaPsarBot:
             # Create the trade request
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": symbol_to_use,
+                "symbol": self.symbol,
                 "volume": self.lot_size,  # Using the smaller lot size from __init__
                 "type": order_type,
                 "price": price,
                 "sl": sl_price,  # Set the stop loss
                 "deviation": 20,
                 "magic": 234000,
-                "comment": "BTC-BOT",  # Simplified comment
+                "comment": "ETH EMA-PSAR",
                 "type_filling": mt5.ORDER_FILLING_IOC,
                 "type_time": mt5.ORDER_TIME_GTC
             }
@@ -1214,7 +984,7 @@ class BTCEmaPsarBot:
                     "timestamp": datetime.now().isoformat()
                 }
                 self.log_trade(trade_data)
-                return False
+                return
             
             # Check if trade was executed successfully
             if result.retcode != mt5.TRADE_RETCODE_DONE:
@@ -1231,264 +1001,454 @@ class BTCEmaPsarBot:
                     "timestamp": datetime.now().isoformat()
                 }
                 self.log_trade(trade_data)
-                return False
             else:
                 # Get the new position's ticket (ID)
-                deal_ticket = result.order
+                position_id = result.order
+                self.console.print(f"[green]Order executed successfully! Ticket: {position_id}[/green]")
                 
-                self.console.print(f"[green]Trade executed successfully! Ticket: {deal_ticket}[/green]")
+                # Initialize partial exits tracking for this position
+                position_key = str(position_id)
+                self.partial_exits_taken[position_key] = set()
                 
-                # Log the successful trade
+                # Get the reason for the trade from the most recent signal generation
+                trade_reason = getattr(self, 'last_signal_reason', 'Unknown reason')
+                
+                # Log the successful trade with our exit strategy details
                 trade_data = {
                     "action": "ENTRY",
                     "signal": signal,
-                    "price": price,
+                    "ticket": position_id,
+                    "entryPrice": price,
                     "stopLoss": sl_price,
-                    "riskPercent": sl_distance_pct,
-                    "ticket": deal_ticket,
-                    "tp1": tp1_price,
-                    "tp2": tp2_price,
-                    "tp3": tp3_price,
-                    "lotSize": self.lot_size,
-                    "timestamp": datetime.now().isoformat(),
+                    "reason": trade_reason,  # Add the reason for the trade
                     "psarDistance": f"{last_row['psar_distance']:.2f}%",
-                    "psarValue": float(last_row['psar']),
-                    "emaFast": float(last_row['ema_9']),
-                    "emaSlow": float(last_row['ema_20'])
+                    "exitStrategy": {
+                        "exit1": {
+                            "percentage": exit1_pct,
+                            "price": tp1_price,
+                            "portion": 0.3,
+                            "status": "PENDING"
+                        },
+                        "exit2": {
+                            "percentage": exit2_pct,
+                            "price": tp2_price,
+                            "portion": 0.3,
+                            "status": "PENDING"
+                        },
+                        "exit3": {
+                            "percentage": exit3_pct,
+                            "price": tp3_price,
+                            "portion": 0.4,
+                            "status": "PENDING"
+                        }
+                    },
+                    "status": "OPEN"
                 }
                 self.log_trade(trade_data)
                 
-                return True
-            
         except Exception as e:
             self.console.print(f"[red]Error executing trade: {str(e)}[/red]")
             import traceback
             self.console.print(f"[red]{traceback.format_exc()}[/red]")
-            return False
 
     def check_exit_conditions(self, df, position):
-        """Check for exit conditions"""
+        """
+        Check exit conditions for open positions
+        Returns: action_executed (bool) - True if any action was taken
+        """
         try:
-            # Use the active symbol for exit conditions
-            symbol_to_use = self.active_symbol if self.active_symbol else self.symbol
+            # Get position details
+            position_type = "BUY" if position.type == mt5.ORDER_TYPE_BUY else "SELL"
+            position_key = str(position.ticket)  # Convert ticket to string for dictionary key
             
-            # Get current price data
-            current_row = df.iloc[-1]
+            # Initialize entry in partial_exits_taken if it doesn't exist
+            if not hasattr(self, 'partial_exits_taken'):
+                self.partial_exits_taken = {}
+            if position_key not in self.partial_exits_taken:
+                self.partial_exits_taken[position_key] = set()
             
-            # Get MT5 current price (more accurate than OHLC)
-            tick = mt5.symbol_info_tick(symbol_to_use)
+            # Get latest data
+            last_row = df.iloc[-1]
+            prev_row = df.iloc[-2]
             
-            if tick is None:
-                # Use dataframe price if we can't get tick data (for testing)
-                self.console.print(f"[yellow]Couldn't get current price for {symbol_to_use}, using dataframe price[/yellow]")
-                
-                if position.type == 0:  # BUY position
-                    current_price = current_row['close']
-                else:  # SELL position
-                    current_price = current_row['close']
-            else:
-                # Use actual bid/ask price from MT5
-                if position.type == 0:  # BUY position
-                    current_price = tick.bid  # We sell at bid price when closing buy positions
-                else:  # SELL position
-                    current_price = tick.ask  # We buy at ask price when closing sell positions
+            # Calculate current profit percentage more accurately using current MT5 data
+            entry_price = position.price_open
+            current_price = position.price_current  # Use actual current price from MT5
             
-            # Get PSAR direction and value
-            psar = current_row['psar']
-            psar_direction = current_row['psar_direction']
+            profit_pct = ((current_price - entry_price) / entry_price * 100) if position_type == "BUY" else \
+                        ((entry_price - current_price) / entry_price * 100)
             
-            # Extract original position open price
-            open_price = position.price_open
-            
-            # Calculate profit percentage
-            if position.type == 0:  # BUY position
-                profit_percent = ((current_price / open_price) - 1) * 100
-            else:  # SELL position
-                profit_percent = ((open_price / current_price) - 1) * 100
-            
-            # Print status with more information
-            position_type = "LONG" if position.type == 0 else "SHORT"
-            self.console.print("\n[bold]Position Status[/bold]")
-            self.console.print(f"Type: {position_type}")
-            self.console.print(f"Open Price: {open_price:.2f}")
+            self.console.print("\n=== Exit Analysis ===")
+            self.console.print(f"Position Type: {position_type}")
+            self.console.print(f"Entry Price: {entry_price:.2f}")
             self.console.print(f"Current Price: {current_price:.2f}")
-            self.console.print(f"Profit/Loss: {profit_percent:.2f}%")
-            self.console.print(f"PSAR: {psar:.2f}")
-            self.console.print(f"PSAR Direction: {psar_direction}")
+            self.console.print(f"Current Profit: {profit_pct:.2f}%")
             
-            # Get position ticket for tracking partial exits
-            position_ticket = position.ticket
+            # Exit Conditions:
             
-            # Check if we've already taken partial exits for this position
-            taken_exits = []
-            if hasattr(self, 'partial_exits_taken') and position_ticket in self.partial_exits_taken:
-                taken_exits = [exit_data["exit_percentage"] for exit_data in self.partial_exits_taken[position_ticket]]
-                
-                # Show which partial exits were already taken
-                self.console.print(f"Partial exits already taken: {[f'{exit*100:.1f}%' for exit in taken_exits]}")
+            # 1. EMA Cross Against Position
+            ema_cross_against = (
+                (position_type == "BUY" and last_row['ema_9'] < last_row['ema_20'] and 
+                 prev_row['ema_9'] > prev_row['ema_20']) or
+                (position_type == "SELL" and last_row['ema_9'] > last_row['ema_20'] and 
+                 prev_row['ema_9'] < prev_row['ema_20'])
+            )
             
-            # For backward compatibility with older state files
-            position_key = str(position.ticket)
-            if hasattr(self, 'partial_exits_taken') and isinstance(self.partial_exits_taken, dict) and \
-               position_key in self.partial_exits_taken and isinstance(self.partial_exits_taken[position_key], set):
-                # Legacy format using 'exit1', 'exit2' strings
-                legacy_exits = self.partial_exits_taken[position_key]
-                if 'exit1' in legacy_exits:
-                    taken_exits.append(0.3)
-                if 'exit2' in legacy_exits:
-                    taken_exits.append(0.5)
-                if 'exit3' in legacy_exits:
-                    taken_exits.append(0.7)
-                if 'exit_full' in legacy_exits:  # Complete exit marker
-                    taken_exits.append(1.0)
-                
-                # Convert to new format
-                self.partial_exits_taken[position_ticket] = [
-                    {"exit_percentage": exit_value, "time": datetime.now(), "reason": "Migrated from legacy format"}
-                    for exit_value in taken_exits
+            # 2. PSAR Flip Against Position
+            psar_flip_against = (
+                (position_type == "BUY" and last_row['psar_direction'] == -1) or
+                (position_type == "SELL" and last_row['psar_direction'] == 1)
+            )
+            
+            # 3. Trailing Stop Based on PSAR
+            trailing_stop_hit = (
+                (position_type == "BUY" and current_price < last_row['psar']) or
+                (position_type == "SELL" and current_price > last_row['psar'])
+            )
+            
+            # 4. Profit Taking Levels
+            take_profit_1 = 0.3  # 0.3% profit
+            take_profit_2 = 0.5  # 0.5% profit
+            take_profit_3 = 0.7  # 0.7% profit
+            
+            # Display take-profit levels and current status
+            self.console.print("\nTake-Profit Levels:")
+            self.console.print(f"TP1 (0.3%): {'Reached' if profit_pct >= take_profit_1 else 'Not reached'} | Executed: {'Yes' if 1 in self.partial_exits_taken[position_key] else 'No'}")
+            self.console.print(f"TP2 (0.5%): {'Reached' if profit_pct >= take_profit_2 else 'Not reached'} | Executed: {'Yes' if 2 in self.partial_exits_taken[position_key] else 'No'}")
+            self.console.print(f"TP3 (0.7%): {'Reached' if profit_pct >= take_profit_3 else 'Not reached'} | Executed: {'Yes' if 3 in self.partial_exits_taken[position_key] else 'No'}")
+            
+            # Check if we've completed all partial exits and need to use trailing stop for remainder
+            all_exits_completed = all(x in self.partial_exits_taken[position_key] for x in [1, 2, 3])
+            
+            # Get current stop loss level
+            current_sl = position.sl
+            
+            # 5. Check for trailing stop after all partial exits
+            if all_exits_completed:
+                # Define trailing stop levels after all partial exits
+                trailing_levels = [
+                    {"level": 0.9, "sl_pct": 0.7},  # When price reaches 0.9%, move SL to 0.7%
+                    {"level": 1.1, "sl_pct": 0.9},  # When price reaches 1.1%, move SL to 0.9%
+                    {"level": 1.3, "sl_pct": 1.1},  # When price reaches 1.3%, move SL to 1.1%
+                    {"level": 1.5, "sl_pct": 1.3},  # When price reaches 1.5%, move SL to 1.3%
                 ]
                 
-                # Clean up old format
-                if position_key != position_ticket:
-                    del self.partial_exits_taken[position_key]
+                # Sort levels from highest to lowest for proper checking
+                if position_type == "BUY":
+                    trailing_levels = sorted(trailing_levels, key=lambda x: x["level"], reverse=True)
+                else:  # For SELL positions, check lowest levels first
+                    trailing_levels = sorted(trailing_levels, key=lambda x: x["level"])
                 
-                self.console.print("[yellow]Migrated partial exit tracking to new format[/yellow]")
+                # Check if we need to update the trailing stop
+                for level_data in trailing_levels:
+                    level = level_data["level"]
+                    sl_pct = level_data["sl_pct"]
+                    
+                    # Calculate new SL price based on entry price and SL percentage
+                    if position_type == "BUY":
+                        new_sl_price = entry_price * (1 + sl_pct/100)
+                        # Only update if price has reached the level and new SL is higher than current SL
+                        if profit_pct >= level and (current_sl is None or new_sl_price > current_sl):
+                            self.console.print(f"[bold green]Updating trailing stop: {sl_pct:.2f}% ({new_sl_price:.2f})[/bold green]")
+                            
+                            # Update SL in MT5
+                            request = {
+                                "action": mt5.TRADE_ACTION_SLTP,
+                                "symbol": self.symbol,
+                                "position": position.ticket,
+                                "sl": new_sl_price,
+                                "tp": position.tp  # Keep TP unchanged
+                            }
+                            
+                            result = mt5.order_send(request)
+                            if result.retcode == mt5.TRADE_RETCODE_DONE:
+                                self.console.print(f"[green]Trailing stop updated to {new_sl_price:.2f}[/green]")
+                                return True  # Action executed
+                            else:
+                                self.console.print(f"[red]Failed to update trailing stop: {result.comment}[/red]")
+                            
+                            break  # Only try to set the highest applicable level
+                    else:  # SELL position
+                        new_sl_price = entry_price * (1 - sl_pct/100)
+                        # Only update if price has reached the level and new SL is lower than current SL
+                        if profit_pct >= level and (current_sl is None or new_sl_price < current_sl):
+                            self.console.print(f"[bold green]Updating trailing stop: {sl_pct:.2f}% ({new_sl_price:.2f})[/bold green]")
+                            
+                            # Update SL in MT5
+                            request = {
+                                "action": mt5.TRADE_ACTION_SLTP,
+                                "symbol": self.symbol,
+                                "position": position.ticket,
+                                "sl": new_sl_price,
+                                "tp": position.tp  # Keep TP unchanged
+                            }
+                            
+                            result = mt5.order_send(request)
+                            if result.retcode == mt5.TRADE_RETCODE_DONE:
+                                self.console.print(f"[green]Trailing stop updated to {new_sl_price:.2f}[/green]")
+                                return True  # Action executed
+                            else:
+                                self.console.print(f"[red]Failed to update trailing stop: {result.comment}[/red]")
+                            
+                            break  # Only try to set the highest applicable level
+                
+                # Immediately after third exit, set SL to the second exit level (0.5%)
+                trailing_sl_key = f"trailing_sl_set_{position_key}"
+                if not hasattr(self, trailing_sl_key) or not getattr(self, trailing_sl_key, False):
+                    if position_type == "BUY":
+                        new_sl_price = entry_price * (1 + take_profit_2/100)  # Set to TP2 level (0.5%)
+                    else:  # SELL position
+                        new_sl_price = entry_price * (1 - take_profit_2/100)  # Set to TP2 level (0.5%)
+                    
+                    # Only update if current SL is below/above the new SL
+                    if current_sl is None or (position_type == "BUY" and new_sl_price > current_sl) or \
+                                            (position_type == "SELL" and new_sl_price < current_sl):
+                        self.console.print(f"[bold green]Setting initial trailing stop after all exits: {take_profit_2:.2f}% ({new_sl_price:.2f})[/bold green]")
+                        
+                        # Update SL in MT5
+                        request = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "symbol": self.symbol,
+                            "position": position.ticket,
+                            "sl": new_sl_price,
+                            "tp": position.tp  # Keep TP unchanged
+                        }
+                        
+                        result = mt5.order_send(request)
+                        if result.retcode == mt5.TRADE_RETCODE_DONE:
+                            self.console.print(f"[green]Initial trailing stop set to {new_sl_price:.2f}[/green]")
+                            # Mark that we've set the initial trailing SL
+                            setattr(self, trailing_sl_key, True)
+                            self.save_state()  # Save the state to persist this setting
+                            return True  # Action executed
+                        else:
+                            self.console.print(f"[red]Failed to set initial trailing stop: {result.comment}[/red]")
             
-            # Logic for LONG position exit
-            if position.type == 0:  # LONG position
-                
-                # Check for partial exit at 0.3% profit if not already taken
-                if profit_percent >= 0.3 and 0.3 not in taken_exits:
-                    self.console.print("[yellow]Exit condition met: 0.3% partial profit target reached[/yellow]")
-                    # Take 30% partial profit
-                    return "PARTIAL_EXIT", 0.3, "0.3% Partial Take Profit"
-                
-                # Check for partial exit at 0.5% profit if not already taken
-                if profit_percent >= 0.5 and 0.5 not in taken_exits:
-                    self.console.print("[yellow]Exit condition met: 0.5% partial profit target reached[/yellow]")
-                    # Take 50% partial profit (of the remaining position)
-                    return "PARTIAL_EXIT", 0.5, "0.5% Partial Take Profit"
-                
-                # Technical exit condition: PSAR above the close price (trend reversal)
-                # Only if we've already taken partial exits
-                if psar_direction == "Bearish" and taken_exits:
-                    self.console.print("[yellow]Exit condition met: PSAR turned bearish after taking partial exits[/yellow]")
-                    return "EXIT", 1.0, "PSAR Trend Reversal Exit"
+            # Log conditions
+            self.console.print("\nExit Conditions:")
+            self.console.print(f"EMA Cross Against: {'Yes' if ema_cross_against else 'No'}")
+            self.console.print(f"PSAR Flip Against: {'Yes' if psar_flip_against else 'No'}")
+            self.console.print(f"Trailing Stop Hit: {'Yes' if trailing_stop_hit else 'No'}")
+            self.console.print(f"All Partial Exits Completed: {'Yes' if all_exits_completed else 'No'}")
             
-            # Logic for SHORT position exit
-            else:  # SHORT position
-                
-                # Check for partial exit at 0.3% profit if not already taken
-                if profit_percent >= 0.3 and 0.3 not in taken_exits:
-                    self.console.print("[yellow]Exit condition met: 0.3% partial profit target reached[/yellow]")
-                    # Take 30% partial profit
-                    return "PARTIAL_EXIT", 0.3, "0.3% Partial Take Profit"
-                
-                # Check for partial exit at 0.5% profit if not already taken
-                if profit_percent >= 0.5 and 0.5 not in taken_exits:
-                    self.console.print("[yellow]Exit condition met: 0.5% partial profit target reached[/yellow]")
-                    # Take 50% partial profit (of the remaining position)
-                    return "PARTIAL_EXIT", 0.5, "0.5% Partial Take Profit"
-                
-                # Technical exit condition: PSAR below the close price (trend reversal)
-                # Only if we've already taken partial exits
-                if psar_direction == "Bullish" and taken_exits:
-                    self.console.print("[yellow]Exit condition met: PSAR turned bullish after taking partial exits[/yellow]")
-                    return "EXIT", 1.0, "PSAR Trend Reversal Exit"
+            # Track if we should fully exit the position
+            should_exit = False
+            exit_reason = None
             
-            # No exit conditions met
-            self.console.print("[green]No exit conditions met. Holding position.[/green]")
-            return None, 0, None
-        
+            # Track if we executed any action (partial or full exit)
+            action_executed = False
+            
+            # Exit Decision Logic for full exit
+            if profit_pct >= take_profit_3:
+                should_exit = True
+                exit_reason = f"Take Profit 3 hit ({take_profit_3}%)"
+                
+            elif profit_pct >= take_profit_2:
+                if psar_flip_against or ema_cross_against:
+                    should_exit = True
+                    exit_reason = f"Take Profit 2 ({take_profit_2}%) with confirmation"
+                    
+            elif profit_pct >= take_profit_1:
+                if psar_flip_against and ema_cross_against:
+                    should_exit = True
+                    exit_reason = f"Take Profit 1 ({take_profit_1}%) with strong confirmation"
+            
+            # Early Exit Conditions
+            if ema_cross_against and psar_flip_against:
+                should_exit = True
+                exit_reason = "Strong reversal signal (EMA cross + PSAR flip)"
+                
+            if trailing_stop_hit:
+                should_exit = True
+                exit_reason = "Trailing stop (PSAR) hit"
+            
+            # If we should fully exit, do it
+            if should_exit:
+                self.console.print(f"[bold yellow]Executing full exit due to: {exit_reason}[/bold yellow]")
+                result = self.close_position(position, exit_reason)
+                if result:
+                    self.console.print("[green]Full exit execution successful[/green]")
+                    action_executed = True
+                else:
+                    self.console.print("[red]Full exit execution failed![/red]")
+                # Return early since we executed a full exit
+                return action_executed
+            
+            # Process partial exits based on profit levels
+            if profit_pct >= take_profit_3 and 3 not in self.partial_exits_taken[position_key]:
+                self.console.print(f"[bold green]TP3 triggered! Profit: {profit_pct:.2f}% >= {take_profit_3}%[/bold green]")
+                result = self.execute_partial_exit(position, 0.4, f"Take Profit 3 ({take_profit_3}%)")
+                if result:
+                    self.console.print("[green]TP3 execution successful, updating state...[/green]")
+                    self.partial_exits_taken[position_key].add(3)
+                    
+                    # Update SL to TP2 level after TP3 execution
+                    if position_type == "BUY":
+                        new_sl_price = entry_price * (1 + take_profit_2/100)  # Set to TP2 level (0.5%)
+                    else:  # SELL position
+                        new_sl_price = entry_price * (1 - take_profit_2/100)  # Set to TP2 level (0.5%)
+                    
+                    # Only update if current SL is below/above the new SL
+                    current_sl = position.sl
+                    if current_sl is None or (position_type == "BUY" and new_sl_price > current_sl) or \
+                                            (position_type == "SELL" and new_sl_price < current_sl):
+                        self.console.print(f"[bold green]Updating SL after TP3 to TP2 level: {take_profit_2:.2f}% ({new_sl_price:.2f})[/bold green]")
+                        
+                        # Update SL in MT5
+                        request = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "symbol": self.symbol,
+                            "position": position.ticket,
+                            "sl": new_sl_price,
+                            "tp": position.tp  # Keep TP unchanged
+                        }
+                        
+                        sl_result = mt5.order_send(request)
+                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
+                            self.console.print(f"[green]SL updated to {new_sl_price:.2f} after TP3[/green]")
+                        else:
+                            self.console.print(f"[red]Failed to update SL after TP3: {sl_result.comment}[/red]")
+                    
+                    self.save_state()  # Save state to persist between restarts
+                    action_executed = True
+                else:
+                    self.console.print("[red]TP3 execution failed![/red]")
+                
+            elif profit_pct >= take_profit_2 and 2 not in self.partial_exits_taken[position_key] and 1 in self.partial_exits_taken[position_key]:
+                self.console.print(f"[bold green]TP2 triggered! Profit: {profit_pct:.2f}% >= {take_profit_2}%[/bold green]")
+                result = self.execute_partial_exit(position, 0.3, f"Take Profit 2 ({take_profit_2}%)")
+                if result:
+                    self.console.print("[green]TP2 execution successful, updating state...[/green]")
+                    self.partial_exits_taken[position_key].add(2)
+                    
+                    # Update SL to TP1 level after TP2 execution
+                    if position_type == "BUY":
+                        new_sl_price = entry_price * (1 + take_profit_1/100)  # Set to TP1 level (0.3%)
+                    else:  # SELL position
+                        new_sl_price = entry_price * (1 - take_profit_1/100)  # Set to TP1 level (0.3%)
+                    
+                    # Only update if current SL is below/above the new SL
+                    current_sl = position.sl
+                    if current_sl is None or (position_type == "BUY" and new_sl_price > current_sl) or \
+                                            (position_type == "SELL" and new_sl_price < current_sl):
+                        self.console.print(f"[bold green]Updating SL after TP2 to TP1 level: {take_profit_1:.2f}% ({new_sl_price:.2f})[/bold green]")
+                        
+                        # Update SL in MT5
+                        request = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "symbol": self.symbol,
+                            "position": position.ticket,
+                            "sl": new_sl_price,
+                            "tp": position.tp  # Keep TP unchanged
+                        }
+                        
+                        sl_result = mt5.order_send(request)
+                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
+                            self.console.print(f"[green]SL updated to {new_sl_price:.2f} after TP2[/green]")
+                        else:
+                            self.console.print(f"[red]Failed to update SL after TP2: {sl_result.comment}[/red]")
+                    
+                    self.save_state()
+                    action_executed = True
+                else:
+                    self.console.print("[red]TP2 execution failed![/red]")
+                
+            elif profit_pct >= take_profit_1 and 1 not in self.partial_exits_taken[position_key]:
+                self.console.print(f"[bold green]TP1 triggered! Profit: {profit_pct:.2f}% >= {take_profit_1}%[/bold green]")
+                result = self.execute_partial_exit(position, 0.3, f"Take Profit 1 ({take_profit_1}%)")
+                if result:
+                    self.console.print("[green]TP1 execution successful, updating state...[/green]")
+                    self.partial_exits_taken[position_key].add(1)
+                    
+                    # Update SL to breakeven (or small positive) after TP1 execution
+                    # Use a small buffer (e.g., 0.1%) to account for spread and fees
+                    buffer_pct = 0.1
+                    if position_type == "BUY":
+                        new_sl_price = entry_price * (1 + buffer_pct/100)  # Slightly above entry
+                    else:  # SELL position
+                        new_sl_price = entry_price * (1 - buffer_pct/100)  # Slightly below entry
+                    
+                    # Only update if current SL is below/above the new SL
+                    current_sl = position.sl
+                    if current_sl is None or (position_type == "BUY" and new_sl_price > current_sl) or \
+                                            (position_type == "SELL" and new_sl_price < current_sl):
+                        self.console.print(f"[bold green]Updating SL after TP1 to breakeven+: {buffer_pct:.2f}% ({new_sl_price:.2f})[/bold green]")
+                        
+                        # Update SL in MT5
+                        request = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "symbol": self.symbol,
+                            "position": position.ticket,
+                            "sl": new_sl_price,
+                            "tp": position.tp  # Keep TP unchanged
+                        }
+                        
+                        sl_result = mt5.order_send(request)
+                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
+                            self.console.print(f"[green]SL updated to {new_sl_price:.2f} after TP1[/green]")
+                        else:
+                            self.console.print(f"[red]Failed to update SL after TP1: {sl_result.comment}[/red]")
+                    
+                    self.save_state()
+                    action_executed = True
+                else:
+                    self.console.print("[red]TP1 execution failed![/red]")
+            
+            # Final status update
+            self.console.print(f"[dim]Exit check complete. Action taken: {action_executed}[/dim]")
+            
+            # Return whether we executed any action
+            return action_executed
+            
         except Exception as e:
-            self.console.print(f"[red]Error in check_exit_conditions: {str(e)}[/red]")
+            self.console.print(f"[red]Error checking exit conditions: {str(e)}[/red]")
             import traceback
             self.console.print(f"[red]{traceback.format_exc()}[/red]")
-            return None, 0, None
+            return False
 
     def execute_partial_exit(self, position, exit_portion, reason):
         """Execute a partial position exit"""
         try:
-            self.console.print(f"[bold yellow]Attempting to execute partial exit ({exit_portion*100}%) for position #{position.ticket}[/bold yellow]")
-            
-            # Make sure we're using the active symbol
-            symbol_to_use = self.active_symbol or self.symbol
-            
-            # First, get the full details of the current position
-            current_positions = mt5.positions_get(ticket=position.ticket)
-            if not current_positions:
-                self.console.print("[yellow]Position not found. It may have been closed already.[/yellow]")
-                return False
-                
-            # Get original position details
-            original_position = current_positions[0]
-            original_volume = original_position.volume
-            self.console.print(f"[dim]Original position size: {original_volume} lots[/dim]")
-            
             # Calculate volume to close
-            volume_to_close = original_volume * exit_portion
+            original_volume = position.volume
+            volume_to_close = position.volume * exit_portion
             
-            # Get symbol info to check minimum and step constraints
-            symbol_info = mt5.symbol_info(symbol_to_use)
-            if symbol_info is None:
-                self.console.print("[red]Failed to get symbol info, cannot determine volume constraints[/red]")
-                # Try anyway with default settings
-            else:
-                # Check broker's minimum and step constraints
-                min_volume = symbol_info.volume_min
-                volume_step = symbol_info.volume_step
-                
-                self.console.print(f"[dim]Broker constraints: Min volume={min_volume}, Volume step={volume_step}[/dim]")
-                
-                # Ensure volume meets broker's requirements
-                if volume_step > 0:
-                    # Round to the nearest valid step
-                    volume_to_close = round(volume_to_close / volume_step) * volume_step
-                    
-                # Check if calculated volume is below minimum
-                if min_volume is not None and volume_to_close < min_volume:
-                    volume_to_close = min_volume
-                    self.console.print(f"[yellow]⚠️ Volume adjusted to broker minimum: {volume_to_close} lots[/yellow]")
-                    
-                    # Check if minimum lot size would effectively close the whole position
-                    remaining_after_exit = original_volume - volume_to_close
-                    if remaining_after_exit < min_volume:
-                        self.console.print(f"[yellow]⚠️ Remaining size ({remaining_after_exit} lots) would be below minimum ({min_volume} lots)[/yellow]")
-                        self.console.print("[yellow]This will effectively close the entire position[/yellow]")
-                
-                # Ensure volume doesn't exceed position size
-                if volume_to_close > original_volume:
-                    volume_to_close = original_volume
-                    self.console.print("[yellow]⚠️ Volume adjusted to match full position size[/yellow]")
+            # Round volume to broker's requirements (usually 0.01 is minimum)
+            # Most brokers require 0.01 lot steps
+            volume_to_close = round(volume_to_close, 2)
+            
+            # Ensure volume is at least the minimum (0.01 lots)
+            if volume_to_close < 0.01:
+                volume_to_close = 0.01
+                self.console.print("[yellow]Warning: Adjusted partial exit volume to minimum 0.01 lots[/yellow]")
+            
+            # Ensure volume doesn't exceed position size
+            if volume_to_close > position.volume:
+                volume_to_close = position.volume
+                self.console.print("[yellow]Warning: Adjusted volume to match position size[/yellow]")
             
             # Get current price for the exit
-            tick = mt5.symbol_info_tick(symbol_to_use)
-            if tick is None:
-                self.console.print("[red]Failed to get symbol tick info, cannot execute partial exit[/red]")
-                return False
-                
-            price = tick.bid if original_position.type == mt5.ORDER_TYPE_BUY else tick.ask
+            price = mt5.symbol_info_tick(self.symbol).bid if position.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(self.symbol).ask
             
-            self.console.print(f"[yellow]Executing partial exit: {volume_to_close} lots of {original_volume} lots ({(volume_to_close/original_volume)*100:.1f}%) at {price}...[/yellow]")
+            self.console.print(f"[yellow]Attempting partial exit: {volume_to_close} lots at {price}...[/yellow]")
             
-            # Create the order request
+            # Simplified comment
+            comment = "Partial Exit"
+            
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": symbol_to_use,
+                "symbol": self.symbol,
                 "volume": volume_to_close,
-                "type": mt5.ORDER_TYPE_SELL if original_position.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
-                "position": original_position.ticket,
+                "type": mt5.ORDER_TYPE_SELL if position.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
+                "position": position.ticket,
                 "price": price,
                 "deviation": 20,
                 "magic": 234000,
-                "comment": "PartialExit",  # Simplified comment - MT5 may have restrictions on comment format
+                "comment": comment,
                 "type_filling": mt5.ORDER_FILLING_IOC,
                 "type_time": mt5.ORDER_TIME_GTC
             }
             
-            self.console.print(f"[dim]Sending partial exit request: {request}[/dim]")
-            
-            # Send the order request
             result = mt5.order_send(request)
             
             # Handle case when result is None
@@ -1496,100 +1456,65 @@ class BTCEmaPsarBot:
                 error_code = mt5.last_error()
                 self.console.print(f"[red]MT5 order_send returned None. Error code: {error_code}[/red]")
                 
-                # Try to get updated position info
-                updated_positions = mt5.positions_get(ticket=position.ticket)
-                if not updated_positions:
-                    self.console.print("[yellow]Position no longer exists - may have been closed by another process[/yellow]")
-                    return True
+                # Query broker for valid volume steps
+                symbol_info = mt5.symbol_info(self.symbol)
+                if symbol_info is not None:
+                    self.console.print(f"[yellow]Broker info: Min volume: {symbol_info.volume_min}, Step: {symbol_info.volume_step}[/yellow]")
                     
-                self.console.print("[red]Failed to execute partial exit[/red]")
-                return False
+                    # Try again with corrected volume
+                    if symbol_info.volume_step > 0:
+                        corrected_volume = round(volume_to_close / symbol_info.volume_step) * symbol_info.volume_step
+                        if corrected_volume >= symbol_info.volume_min and corrected_volume <= position.volume:
+                            self.console.print(f"[yellow]Retrying with corrected volume: {corrected_volume}[/yellow]")
+                            request["volume"] = corrected_volume
+                            result = mt5.order_send(request)
+                        else:
+                            self.console.print(f"[red]Cannot execute partial exit: volume {corrected_volume} outside allowed range[/red]")
+                            return False
+                
+                # If still None after retry
+                if result is None:
+                    # Try to get updated position info
+                    positions = mt5.positions_get(ticket=position.ticket)
+                    if not positions:
+                        self.console.print("[yellow]Position no longer exists - may have been closed already[/yellow]")
+                        return True
+                        
+                    self.console.print("[red]Failed to execute partial exit[/red]")
+                    return False
             
             if result.retcode != mt5.TRADE_RETCODE_DONE:
                 self.console.print(f"[red]Partial exit failed: {result.comment} (code {result.retcode})[/red]")
                 
                 # Additional diagnostics for volume errors
                 if result.retcode == 10014:  # Invalid volume error
-                    # Get updated symbol info
-                    symbol_info = mt5.symbol_info(symbol_to_use)
+                    symbol_info = mt5.symbol_info(self.symbol)
                     if symbol_info is not None:
                         self.console.print(f"[yellow]Broker requires: Min volume: {symbol_info.volume_min}, Step: {symbol_info.volume_step}[/yellow]")
                         self.console.print(f"[yellow]We tried: {volume_to_close} lots[/yellow]")
                         
-                        # Check if minimum lot size equals or exceeds position size
-                        if symbol_info.volume_min >= original_volume:
-                            self.console.print("[yellow]⚠️ Current position size is already at broker minimum. Cannot execute partial exit.[/yellow]")
-                            self.console.print("[yellow]To exit, the position must be closed completely.[/yellow]")
-                            
-                            # Ask user for confirmation to close completely
-                            self.console.print("[bold yellow]Would you like to close the entire position instead? (Automatically proceeding in 10 seconds)[/bold yellow]")
-                            
-                            # No interactivity - just proceed with full close
-                            time.sleep(10)
-                            return self.close_position(original_position, reason + " (adjusted to full exit due to broker minimum lot size)")
+                        # Try closing the full position instead
+                        self.console.print("[yellow]Attempting to close full position instead...[/yellow]")
+                        return self.close_position(position, reason + " (adjusted to full exit)")
                 
                 return False
             else:
-                # Get updated position info to verify the partial exit worked
-                time.sleep(1)  # Wait a moment for the broker to process
-                updated_positions = mt5.positions_get(ticket=position.ticket)
-                
-                if not updated_positions:
-                    # Position closed completely, even though we requested partial
-                    self.console.print("[yellow]Position was closed completely, even though partial exit was requested[/yellow]")
-                    
-                    # Log the complete exit
-                    exit_data = {
-                        "action": "FULL_EXIT",
-                        "ticket": original_position.ticket,
-                        "volume": original_volume,
-                        "entryPrice": original_position.price_open,
-                        "exitPrice": price,
-                        "profit": original_position.profit,
-                        "exitReason": reason + " (became full exit)",
-                        "status": "FULL_CLOSE"
-                    }
-                    self.log_trade(exit_data)
-                    
-                    position_key = str(original_position.ticket)
-                    if position_key in self.partial_exits_taken:
-                        self.partial_exits_taken[position_key].add("exit_full")
-                    
-                    self.save_state()
-                    return True
-                
-                new_position = updated_positions[0]
-                new_volume = new_position.volume
-                volume_change = original_volume - new_volume
-                
-                if abs(volume_change) < 0.0001:  # No actual change in position size
-                    self.console.print("[red]⚠️ MT5 reported success, but position size did not change![/red]")
-                    self.console.print(f"[yellow]Original: {original_volume} lots, Current: {new_volume} lots[/yellow]")
-                    self.console.print("[yellow]The partial exit may have failed due to broker-specific rules[/yellow]")
-                    return False
-                
-                # Successful partial exit
-                self.console.print(f"[green]✓ Partial exit successful: {volume_change} lots at {price} ({reason})[/green]")
-                self.console.print(f"[green]Position size reduced from {original_volume} to {new_volume} lots[/green]")
-                self.console.print(f"[green]Profit for this portion: ${original_position.profit * (volume_change/original_volume):.2f}[/green]")
+                self.console.print(f"[green]✓ Partial exit successful: {volume_to_close} lots at {price} ({reason})[/green]")
+                self.console.print(f"[green]Profit for this portion: ${position.profit * (volume_to_close/original_volume):.2f}[/green]")
                 
                 # Log partial exit
                 exit_data = {
                     "action": "PARTIAL_EXIT",
-                    "ticket": original_position.ticket,
+                    "ticket": position.ticket,
                     "exitPortion": exit_portion,
-                    "volume": volume_change,
-                    "entryPrice": original_position.price_open,
-                    "exitPrice": price,
-                    "profit": original_position.profit * (volume_change/original_volume),
+                    "volume": volume_to_close,
+                    "entryPrice": position.price_open,
+                    "soldAt" if position.type == mt5.ORDER_TYPE_BUY else "boughtAt": price,
+                    "profit": position.profit * (volume_to_close/original_volume),
                     "exitReason": reason,
                     "status": "PARTIAL_CLOSE"
                 }
                 self.log_trade(exit_data)
-                
-                # Save state to ensure we don't lose track
-                self.save_state()
-                
                 return True
                 
         except Exception as e:
@@ -1763,14 +1688,6 @@ class BTCEmaPsarBot:
                     self.crossover_price = state.get('crossover_price', None)
                     self.crossover_time = state.get('crossover_time', None)
                     self.partial_exits_taken = state.get('partial_exits_taken', {})
-                    self.last_psar_direction = state.get('last_psar_direction', None)
-                    self.psar_direction_changed = state.get('psar_direction_changed', False)
-                    self.psar_direction_change_time = state.get('psar_direction_change_time', None)
-                    
-                    # Load counter-trend tracking
-                    self.counter_trend_positions = state.get('counter_trend_positions', {})
-                    self.counter_trend_active = state.get('counter_trend_active', False)
-                    self.last_counter_trend_check = state.get('last_counter_trend_check', 0)
                     
                     # Convert string keys back to proper format for partial_exits_taken
                     if isinstance(self.partial_exits_taken, dict):
@@ -1787,12 +1704,6 @@ class BTCEmaPsarBot:
             self.crossover_price = None
             self.crossover_time = None
             self.partial_exits_taken = {}
-            self.last_psar_direction = None
-            self.psar_direction_changed = False
-            self.psar_direction_change_time = None
-            self.counter_trend_positions = {}
-            self.counter_trend_active = False
-            self.last_counter_trend_check = 0
 
     def save_state(self):
         """Save the bot's state to a file"""
@@ -1813,10 +1724,7 @@ class BTCEmaPsarBot:
                 'partial_exits_taken': partial_exits_json,
                 'last_psar_direction': self.last_psar_direction,
                 'psar_direction_changed': self.psar_direction_changed,
-                'psar_direction_change_time': self.psar_direction_change_time,
-                'counter_trend_positions': self.counter_trend_positions,
-                'counter_trend_active': self.counter_trend_active,
-                'last_counter_trend_check': self.last_counter_trend_check
+                'psar_direction_change_time': self.psar_direction_change_time
             }
             
             with open(self.state_file, 'w') as f:
@@ -1825,372 +1733,6 @@ class BTCEmaPsarBot:
             self.console.print("[green]State saved successfully[/green]")
         except Exception as e:
             self.console.print(f"[red]Error saving state: {str(e)}[/red]")
-            import traceback
-            self.console.print(f"[red]{traceback.format_exc()}[/red]")
-
-    def check_for_counter_trend_opportunity(self, df, position):
-        """Check for counter-trend trading opportunities based on PSAR flips and EMA gap ROC.
-        
-        This method identifies counter-trend trading opportunities when:
-        1. There's an existing profitable position
-        2. PSAR direction is against the current position (not just flipped)
-        3. EMA gap has been widening (strong trend) but is now narrowing (potential reversal)
-        4. Price is showing momentum in the counter direction
-        
-        Args:
-            df: DataFrame with price and indicator data
-            position: The current open position
-            
-        Returns:
-            str: Counter-trend signal ("BUY", "SELL", or None)
-        """
-        try:
-            if df is None or len(df) < 4:  # Need at least 4 bars for ROC calculations
-                return None
-            
-            # Get the latest data
-            last_row = df.iloc[-1]
-            prev_row = df.iloc[-2]
-            
-            # Current indicators
-            current_price = last_row['close']
-            prev_price = prev_row['close']
-            ema_fast = last_row['ema_9']
-            ema_slow = last_row['ema_20']
-            psar = last_row['psar']
-            psar_direction = last_row['psar_direction']
-            prev_psar_direction = prev_row['psar_direction']
-            
-            # Check if we have the gap metrics
-            if 'ema_gap' not in last_row or 'ema_gap_roc_3' not in last_row:
-                self.console.print("[yellow]Missing EMA gap metrics, can't check for counter-trend opportunities[/yellow]")
-                return None
-            
-            # Get the EMA gap metrics
-            ema_gap = last_row['ema_gap']
-            ema_gap_roc_3 = last_row['ema_gap_roc_3']
-            gap_widening = last_row['gap_widening']
-            
-            # Calculate current profit percentage for the position
-            entry_price = position.price_open
-            current_position_price = position.price_current
-            profit_pct = ((current_position_price / entry_price) - 1) * 100
-            if position.type == mt5.POSITION_TYPE_SELL:
-                profit_pct = -profit_pct
-            
-            # Initialize counter-trend signal to None
-            counter_signal = None
-            
-            # Only consider counter-trend if the current position is profitable
-            if profit_pct < 0.15:  # Minimum profit threshold
-                self.console.print("[dim]Position not profitable enough for counter-trend strategy[/dim]")
-                return None
-            
-            # Display counter-trend analysis
-            self.console.print("\n=== Counter-Trend Analysis ===")
-            self.console.print(f"Current Position: {'BUY' if position.type == mt5.POSITION_TYPE_BUY else 'SELL'}")
-            self.console.print(f"Current Profit: {profit_pct:.2f}%")
-            self.console.print(f"PSAR Direction: {'Bullish' if psar_direction == 1 else 'Bearish'}")
-            self.console.print(f"PSAR Direction Changed: {'Yes' if psar_direction != prev_psar_direction else 'No'}")
-            self.console.print(f"EMA Gap: {ema_gap:.4f}")
-            self.console.print(f"EMA Gap ROC (3-period): {ema_gap_roc_3:.2f}%")
-            self.console.print(f"Gap Widening: {'Yes' if gap_widening else 'No'}")
-            
-            # Check if PSAR has just flipped direction (from previous bar to current)
-            psar_flipped = psar_direction != prev_psar_direction
-            
-            # For a BUY position, check for counter-trend SELL opportunity
-            if position.type == mt5.POSITION_TYPE_BUY:
-                # Check if PSAR is bearish (above price) or just flipped bearish
-                psar_is_bearish = psar_direction == -1
-                psar_flipped_bearish = psar_flipped and psar_is_bearish
-                
-                # Check price movement is downward
-                price_moving_down = current_price < prev_price
-                
-                # Check if price is near EMA fast line but not crossed below slow line
-                price_near_ema9 = current_price < ema_fast * 1.005  # Within 0.5% of EMA9
-                
-                # Check for significant previous trend strength
-                strong_trend = ema_gap_roc_3 > 5.0  # Gap was widening rapidly
-                
-                # Check for trend reversal signs - now using psar_is_bearish instead of requiring a flip
-                reversal_signal = not gap_widening and psar_is_bearish
-                
-                # Log conditions - show both if PSAR just flipped and if it's currently in the right direction
-                self.console.print("\n[bold]Counter-trend SELL conditions:[/bold]")
-                self.console.print(f"✓ PSAR Just Flipped Bearish: {'✅' if psar_flipped_bearish else '❌'}")
-                self.console.print(f"✓ PSAR Is Bearish: {'✅' if psar_is_bearish else '❌'}")
-                self.console.print(f"✓ Price Moving Down: {'✅' if price_moving_down else '❌'}")
-                self.console.print(f"✓ Price Near EMA9: {'✅' if price_near_ema9 else '❌'}")
-                self.console.print(f"✓ Previous Strong Trend (EMA Gap ROC): {'✅' if strong_trend else '❌'}")
-                self.console.print(f"✓ Reversal Signal (Gap Narrowing): {'✅' if not gap_widening else '❌'}")
-                
-                # Consider counter-trend SELL if conditions are met (now using psar_is_bearish instead of requiring a flip)
-                if psar_is_bearish and price_moving_down and price_near_ema9:
-                    counter_signal = "SELL"
-                    self.console.print("[bold red]Counter-trend SELL opportunity detected![/bold red]")
-            
-            # For a SELL position, check for counter-trend BUY opportunity
-            elif position.type == mt5.POSITION_TYPE_SELL:
-                # Check if PSAR is bullish (below price) or just flipped bullish
-                psar_is_bullish = psar_direction == 1
-                psar_flipped_bullish = psar_flipped and psar_is_bullish
-                
-                # Check price movement is upward
-                price_moving_up = current_price > prev_price
-                
-                # Check if price is near EMA fast line but not crossed above slow line
-                price_near_ema9 = current_price > ema_fast * 0.995  # Within 0.5% of EMA9
-                
-                # Check for significant previous trend strength
-                strong_trend = ema_gap_roc_3 > 5.0  # Gap was widening rapidly
-                
-                # Check for trend reversal signs - now using psar_is_bullish instead of requiring a flip
-                reversal_signal = not gap_widening and psar_is_bullish
-                
-                # Log conditions - show both if PSAR just flipped and if it's currently in the right direction
-                self.console.print("\n[bold]Counter-trend BUY conditions:[/bold]")
-                self.console.print(f"✓ PSAR Just Flipped Bullish: {'✅' if psar_flipped_bullish else '❌'}")
-                self.console.print(f"✓ PSAR Is Bullish: {'✅' if psar_is_bullish else '❌'}")
-                self.console.print(f"✓ Price Moving Up: {'✅' if price_moving_up else '❌'}")
-                self.console.print(f"✓ Price Near EMA9: {'✅' if price_near_ema9 else '❌'}")
-                self.console.print(f"✓ Previous Strong Trend (EMA Gap ROC): {'✅' if strong_trend else '❌'}")
-                self.console.print(f"✓ Reversal Signal (Gap Narrowing): {'✅' if not gap_widening else '❌'}")
-                
-                # Consider counter-trend BUY if conditions are met (now using psar_is_bullish instead of requiring a flip)
-                if psar_is_bullish and price_moving_up and price_near_ema9:
-                    counter_signal = "BUY"
-                    self.console.print("[bold green]Counter-trend BUY opportunity detected![/bold green]")
-            
-            return counter_signal
-            
-        except Exception as e:
-            self.console.print(f"[red]Error in check_for_counter_trend_opportunity: {str(e)}[/red]")
-            import traceback
-            self.console.print(f"[red]{traceback.format_exc()}[/red]")
-            return None
-
-    def execute_counter_trend_trade(self, signal, df, original_position):
-        """Execute a counter-trend trade to capture retracements
-        
-        This method is similar to execute_trade but specifically for counter-trend opportunities
-        while a position is already open. The counter-trend position size is smaller (50% of regular size)
-        and has tighter stop-loss and take-profit targets.
-        
-        Args:
-            signal: The trading signal ("BUY" or "SELL")
-            df: DataFrame with price and indicator data
-            original_position: The original position we're counter-trading against
-            
-        Returns:
-            bool: True if trade execution was successful, False otherwise
-        """
-        try:
-            last_row = df.iloc[-1]
-            
-            # Get current price for entry
-            price = mt5.symbol_info_tick(self.symbol).ask if signal == "BUY" else mt5.symbol_info_tick(self.symbol).bid
-            
-            # Get key target/indicator prices
-            ema9 = last_row['ema_9']
-            ema20 = last_row['ema_20']
-            psar = last_row['psar']
-            
-            # Use smaller lot size for counter-trend trades (50% of regular)
-            counter_trend_lot_size = self.lot_size * 0.5  
-            
-            # Calculate profit target based on distance to EMA20
-            if signal == "BUY":
-                # For counter-trend BUY, target is near EMA20 (resistance)
-                target_price = ema20
-                # Stop loss is just below recent PSAR
-                stop_loss = psar * 0.995  # 0.5% below PSAR
-            else:  # SELL
-                # For counter-trend SELL, target is near EMA20 (support)
-                target_price = ema20
-                # Stop loss is just above recent PSAR
-                stop_loss = psar * 1.005  # 0.5% above PSAR
-            
-            # Calculate potential R:R ratio
-            potential_gain = abs(target_price - price)
-            potential_loss = abs(price - stop_loss)
-            risk_reward = potential_gain / potential_loss if potential_loss > 0 else 0
-            
-            # Only proceed if R:R is acceptable (at least 1.5:1)
-            if risk_reward < 1.5:
-                self.console.print(f"[yellow]Counter-trend trade rejected: Risk-reward ratio too low ({risk_reward:.2f})[/yellow]")
-                return False
-            
-            # Create unique identifier for this counter-trend trade
-            counter_trend_id = f"counter_{original_position.ticket}_{int(time.time())}"
-            
-            # Prepare trade request
-            request = {
-                "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": self.symbol,
-                "volume": counter_trend_lot_size,
-                "type": mt5.ORDER_TYPE_BUY if signal == "BUY" else mt5.ORDER_TYPE_SELL,
-                "price": price,
-                "sl": stop_loss,
-                "tp": target_price,
-                "deviation": 20,  # Allow slight price deviation
-                "magic": 123457,  # Different magic number to identify counter-trend trades
-                "comment": f"Counter-trend {signal} against position {original_position.ticket}",
-                "type_time": mt5.ORDER_TIME_GTC,
-                "type_filling": mt5.ORDER_FILLING_FOK,
-            }
-            
-            # Display trade details
-            self.console.print("\n=== Counter-Trend Trade Execution ===")
-            self.console.print(f"Signal: {signal}")
-            self.console.print(f"Entry Price: {price}")
-            self.console.print(f"Stop Loss: {stop_loss}")
-            self.console.print(f"Take Profit: {target_price}")
-            self.console.print(f"Risk-Reward Ratio: {risk_reward:.2f}")
-            self.console.print(f"Position Size: {counter_trend_lot_size} lots")
-            
-            # Execute the trade
-            result = mt5.order_send(request)
-            
-            if result.retcode == mt5.TRADE_RETCODE_DONE:
-                self.console.print(f"[bold green]Counter-trend {signal} executed successfully![/bold green]")
-                self.console.print(f"Order ID: {result.order}")
-                
-                # Log the trade
-                trade_data = {
-                    "type": "COUNTER_" + signal,
-                    "original_position": original_position.ticket,
-                    "ticket": result.order,
-                    "entry_price": price,
-                    "stop_loss": stop_loss,
-                    "take_profit": target_price,
-                    "lot_size": counter_trend_lot_size,
-                    "time": datetime.now().isoformat(),
-                    "risk_reward": float(risk_reward),
-                    "ema9_at_entry": float(ema9),
-                    "ema20_at_entry": float(ema20),
-                    "psar_at_entry": float(psar)
-                }
-                self.log_trade(trade_data)
-                
-                # Track this counter-trend position in our state
-                self.counter_trend_positions[str(result.order)] = {
-                    "original_position": original_position.ticket,
-                    "signal": signal,
-                    "entry_time": time.time(),
-                    "entry_price": price
-                }
-                self.counter_trend_active = True
-                self.last_counter_trend_check = time.time()
-                self.save_state()
-                
-                # Adjust the stop loss of the original position to break-even or small profit
-                # This helps protect our profits in the original position
-                if original_position.type == mt5.POSITION_TYPE_BUY:
-                    # For BUY positions, set SL to entry price + small buffer
-                    new_sl = original_position.price_open * 1.001  # 0.1% above entry
-                    
-                    # Only update if new SL is higher than current SL
-                    if original_position.sl is None or new_sl > original_position.sl:
-                        sl_request = {
-                            "action": mt5.TRADE_ACTION_SLTP,
-                            "symbol": self.symbol,
-                            "position": original_position.ticket,
-                            "sl": new_sl,
-                            "tp": original_position.tp  # Keep TP unchanged
-                        }
-                        
-                        sl_result = mt5.order_send(sl_request)
-                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
-                            self.console.print(f"[green]Updated original position stop loss to break-even+: {new_sl:.2f}[/green]")
-                        else:
-                            self.console.print(f"[yellow]Failed to update original position stop loss: {sl_result.comment}[/yellow]")
-                
-                elif original_position.type == mt5.POSITION_TYPE_SELL:
-                    # For SELL positions, set SL to entry price - small buffer
-                    new_sl = original_position.price_open * 0.999  # 0.1% below entry
-                    
-                    # Only update if new SL is lower than current SL
-                    if original_position.sl is None or new_sl < original_position.sl:
-                        sl_request = {
-                            "action": mt5.TRADE_ACTION_SLTP,
-                            "symbol": self.symbol,
-                            "position": original_position.ticket,
-                            "sl": new_sl,
-                            "tp": original_position.tp  # Keep TP unchanged
-                        }
-                        
-                        sl_result = mt5.order_send(sl_request)
-                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
-                            self.console.print(f"[green]Updated original position stop loss to break-even+: {new_sl:.2f}[/green]")
-                        else:
-                            self.console.print(f"[yellow]Failed to update original position stop loss: {sl_result.comment}[/yellow]")
-                
-                return True
-            else:
-                self.console.print(f"[bold red]Counter-trend trade execution failed![/bold red]")
-                self.console.print(f"Error Code: {result.retcode}")
-                self.console.print(f"Error Description: {result.comment}")
-                return False
-        
-        except Exception as e:
-            self.console.print(f"[red]Error executing counter-trend trade: {str(e)}[/red]")
-            import traceback
-            self.console.print(f"[red]{traceback.format_exc()}[/red]")
-            return False
-
-    def check_counter_trend_positions(self):
-        """Check status of counter-trend positions and clean up expired entries"""
-        if not self.counter_trend_active or not self.counter_trend_positions:
-            return
-        
-        self.console.print("[dim]Checking counter-trend positions...[/dim]")
-        
-        try:
-            # Get all current positions
-            positions = mt5.positions_get(symbol=self.symbol)
-            if positions is None:
-                self.console.print("[yellow]Failed to get positions for counter-trend check[/yellow]")
-                return
-            
-            active_tickets = [str(pos.ticket) for pos in positions]
-            counter_tickets = list(self.counter_trend_positions.keys())
-            
-            # Check which counter-trend positions are no longer active
-            for ticket in counter_tickets:
-                if ticket not in active_tickets:
-                    # This counter-trend position has been closed
-                    position_info = self.counter_trend_positions[ticket]
-                    self.console.print(f"[green]Counter-trend position {ticket} has been closed[/green]")
-                    
-                    # Remove from tracking
-                    self.counter_trend_positions.pop(ticket, None)
-            
-            # Update counter_trend_active flag if no positions left
-            if not self.counter_trend_positions:
-                self.counter_trend_active = False
-                self.console.print("[green]No more active counter-trend positions[/green]")
-            
-            # Clean up any counter-trend positions older than 24 hours
-            # (This is a safety measure to prevent tracking old positions forever)
-            current_time = time.time()
-            expired_tickets = []
-            
-            for ticket, info in self.counter_trend_positions.items():
-                if current_time - info["entry_time"] > 86400:  # 24 hours
-                    expired_tickets.append(ticket)
-            
-            for ticket in expired_tickets:
-                self.console.print(f"[yellow]Removing expired counter-trend position tracking: {ticket}[/yellow]")
-                self.counter_trend_positions.pop(ticket, None)
-            
-            # Save state after any changes
-            if expired_tickets or counter_tickets != list(self.counter_trend_positions.keys()):
-                self.save_state()
-                
-        except Exception as e:
-            self.console.print(f"[red]Error checking counter-trend positions: {str(e)}[/red]")
             import traceback
             self.console.print(f"[red]{traceback.format_exc()}[/red]")
 

@@ -156,7 +156,7 @@ class BTCTradingBot:
             return False
         
         # Login to MT5 (use your credentials)
-        if not mt5.login(login=182992485, password="QAZwsx456!", server="Exness-MT5Trial6"):
+        if not mt5.login(login=244126636, password="QAZwsx@123!", server="Exness-MT5Trial4"):
             self.console.print("[bold red]MT5 login failed![/bold red]")
             mt5.shutdown()
             return False

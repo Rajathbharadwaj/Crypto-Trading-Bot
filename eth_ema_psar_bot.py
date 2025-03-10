@@ -9,6 +9,8 @@ import time
 import os
 import json
 import gc  # Add garbage collection module
+import math
+import random
 
 # Define a custom JSON encoder for NumPy types
 class NumpyEncoder(json.JSONEncoder):
@@ -21,6 +23,8 @@ class NumpyEncoder(json.JSONEncoder):
             return bool(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
 class ETHEmaPsarBot:
@@ -41,7 +45,9 @@ class ETHEmaPsarBot:
         }
         
         self.console = Console()
-        self.symbol = "ETHUSD"
+        self.symbol = "ETHUSD"  # Default symbol
+        self.alt_symbols = ["ETHUSDT", "ETH/USD", "ETH"]  # Alternative symbols to try
+        self.active_symbol = None  # Will be set to working symbol during initialization
         self.timeframe = self.TIMEFRAMES["M15"]  # Default to M15
         self.running = True
         
@@ -67,6 +73,11 @@ class ETHEmaPsarBot:
         self.psar_direction_changed = False
         self.psar_direction_change_time = None
         
+        # Add counter-trend tracking
+        self.counter_trend_positions = {}  # Dict to track counter-trend positions by ticket
+        self.counter_trend_active = False  # Flag to track if we have active counter-trend trades
+        self.last_counter_trend_check = 0  # Timestamp of last counter-trend check
+        
         # Initialize MT5
         if not self.initialize_mt5():
             raise Exception("Failed to initialize MT5")
@@ -88,6 +99,8 @@ class ETHEmaPsarBot:
         # Check if MT5 is already initialized
         if mt5.terminal_info() is not None:
             self.console.print("[green]MT5 is already initialized[/green]")
+            # Try to get symbol info and alternative symbols
+            self._find_valid_eth_symbol()
             return True
             
         # Try to initialize if not already
@@ -100,13 +113,16 @@ class ETHEmaPsarBot:
         for attempt in range(1, max_attempts + 1):
             try:
                 self.console.print(f"[yellow]MT5 login attempt {attempt}/{max_attempts}...[/yellow]")
-                if mt5.login(login=182992485, password="QAZwsx456!", server="Exness-MT5Trial6"):
+                if mt5.login(login=239849973, password="QAZwsx456!", server="Exness-MT5Trial6"):
                     self.console.print("[green]Successfully logged in to MT5[/green]")
                     
                     # Create log directory if it doesn't exist
                     if not os.path.exists(self.log_dir):
                         os.makedirs(self.log_dir)
-                        
+                    
+                    # Find a valid ETH symbol
+                    self._find_valid_eth_symbol()
+                    
                     return True
                 else:
                     error_code = mt5.last_error()
@@ -155,22 +171,41 @@ class ETHEmaPsarBot:
                 # IMPORTANT: ta.psar requires pandas Series, not NumPy arrays
                 # DO NOT convert to numpy arrays for this calculation
                 psar = ta.psar(
-                    high=df['high'],  # Keep as pandas Series
-                    low=df['low'],    # Keep as pandas Series
-                    close=df['close'], # Keep as pandas Series
+                        high=df['high'],  # Keep as pandas Series
+                        low=df['low'],    # Keep as pandas Series
+                        close=df['close'], # Keep as pandas Series
                     af0=self.psar_step, 
                     af=self.psar_step, 
                     max_af=self.psar_max
                 )
                 
+                # Debug: Print PSAR dataframe columns and sample data
+                self.console.print("[yellow]PSAR Debug Information:[/yellow]")
+                self.console.print(f"PSAR columns: {list(psar.columns)}")
+                if len(psar) > 0:
+                    # Show first few and last few rows to understand the pattern
+                    self.console.print("First 5 rows of PSAR data:")
+                    self.console.print(psar.head(5).to_string())
+                    
+                    self.console.print("\nLast 5 rows of PSAR data:")
+                    self.console.print(psar.tail(5).to_string())
+                    
+                    # Check if there are NaN values
+                    nan_counts = {col: psar[col].isna().sum() for col in psar.columns}
+                    self.console.print(f"NaN counts in PSAR: {nan_counts}")
+                
                 # Get column names for long and short PSAR
                 psar_l_col = f'PSARl_{self.psar_step}_{self.psar_max}'
                 psar_s_col = f'PSARs_{self.psar_step}_{self.psar_max}'
+                psar_r_col = f'PSARr_{self.psar_step}_{self.psar_max}'  # Reversal indicator
                 
                 # Check that we have the expected columns
-                if psar_l_col not in psar.columns or psar_s_col not in psar.columns:
+                expected_cols = [psar_l_col, psar_s_col]
+                missing_cols = [col for col in expected_cols if col not in psar.columns]
+                
+                if missing_cols:
                     available_cols = list(psar.columns)
-                    self.console.print(f"[yellow]Warning: Expected PSAR columns not found. Available: {available_cols}[/yellow]")
+                    self.console.print(f"[yellow]Warning: Missing expected PSAR columns: {missing_cols}. Available: {available_cols}[/yellow]")
                     
                     # Try to find the right columns based on prefix
                     psar_l_candidates = [col for col in psar.columns if col.startswith('PSARl_')]
@@ -181,21 +216,84 @@ class ETHEmaPsarBot:
                         psar_s_col = psar_s_candidates[0]
                         self.console.print(f"[yellow]Using alternative PSAR columns: {psar_l_col} and {psar_s_col}[/yellow]")
                     else:
-                        self.console.print("[red]Could not find suitable PSAR columns[/red]")
-                        return None
+                        # More aggressive column search - check for anything with PSAR
+                        psar_candidates = [col for col in psar.columns if 'PSAR' in col.upper()]
+                        
+                        if len(psar_candidates) >= 2:
+                            # Assuming first is long (below price) and second is short (above price)
+                            psar_l_col = psar_candidates[0]
+                            psar_s_col = psar_candidates[1]
+                            self.console.print(f"[yellow]Using detected PSAR columns: {psar_l_col} and {psar_s_col}[/yellow]")
+                        elif len(psar_candidates) == 1:
+                            # If only one column, use it for both 
+                            psar_l_col = psar_s_col = psar_candidates[0]
+                            self.console.print(f"[yellow]Only found a single PSAR column: {psar_l_col}[/yellow]")
+                        else:
+                            self.console.print("[red]Could not find any suitable PSAR columns[/red]")
+                            # Print the first few rows of the dataframe to debug
+                            self.console.print(f"First row of PSAR dataframe: {psar.iloc[0].to_dict()}")
+                            return None
                 
+                # Improved approach to combine PSARl and PSARs into a single psar column
                 # Initialize PSAR column
                 df['psar'] = np.nan
+                df['psar_trend'] = np.nan  # Add trend indicator (1 for bullish, -1 for bearish)
                 
-                # Fill with long PSAR values (safer method)
-                mask_l = ~psar[psar_l_col].isna()
-                if mask_l.any():
-                    df.loc[mask_l, 'psar'] = psar.loc[mask_l, psar_l_col]
+                # First, try to get the trend indicator if available
+                if psar_r_col in psar.columns:
+                    # PSARr is 1 for bullish-to-bearish reversal and 0 for bearish-to-bullish or continuation
+                    df['psar_trend'] = np.where(psar[psar_r_col] == 1, -1, 1)
+                    self.console.print(f"Using PSAR reversal indicator from {psar_r_col}")
                 
-                # Fill with short PSAR values
-                mask_s = ~psar[psar_s_col].isna()
-                if mask_s.any():
-                    df.loc[mask_s, 'psar'] = psar.loc[mask_s, psar_s_col]
+                # Fill the PSAR values based on which column has data (not NaN)
+                # For each row, take value from PSARl if it's not NaN (bullish), otherwise from PSARs (bearish)
+                for i in range(len(df)):
+                    if i < len(psar):  # Ensure we don't go out of bounds
+                        if pd.notna(psar.iloc[i][psar_l_col]):
+                            # Bullish - PSAR is below price
+                            df.iloc[i, df.columns.get_loc('psar')] = psar.iloc[i][psar_l_col]
+                            if pd.isna(df.iloc[i, df.columns.get_loc('psar_trend')]):
+                                df.iloc[i, df.columns.get_loc('psar_trend')] = 1  # Bullish
+                        elif pd.notna(psar.iloc[i][psar_s_col]):
+                            # Bearish - PSAR is above price
+                            df.iloc[i, df.columns.get_loc('psar')] = psar.iloc[i][psar_s_col]
+                            if pd.isna(df.iloc[i, df.columns.get_loc('psar_trend')]):
+                                df.iloc[i, df.columns.get_loc('psar_trend')] = -1  # Bearish
+                
+                # After filling, check for any remaining NaN values
+                nan_count = df['psar'].isna().sum()
+                if nan_count > 0:
+                    self.console.print(f"[yellow]Found {nan_count} NaN values in combined PSAR column[/yellow]")
+                    
+                    # For missing values, forward fill then backward fill
+                    df['psar'] = df['psar'].fillna(method='ffill').fillna(method='bfill')
+                    
+                    # If still NaN (e.g., at the start), use close price
+                    df['psar'] = df['psar'].fillna(df['close'])
+                    
+                    # Check again
+                    nan_count_after = df['psar'].isna().sum()
+                    if nan_count_after > 0:
+                        self.console.print(f"[red]Still have {nan_count_after} NaN values in PSAR after filling[/red]")
+                    else:
+                        self.console.print("[green]All NaN values in PSAR fixed[/green]")
+                
+                # For missing trend values, determine based on price vs PSAR relationship
+                nan_trend_count = df['psar_trend'].isna().sum()
+                if nan_trend_count > 0:
+                    self.console.print(f"[yellow]Found {nan_trend_count} NaN values in PSAR trend indicator[/yellow]")
+                    
+                    # Determine trend by comparing PSAR with price (PSAR below price = bullish)
+                    for i in range(len(df)):
+                        if pd.isna(df.iloc[i, df.columns.get_loc('psar_trend')]):
+                            if df.iloc[i]['psar'] < df.iloc[i]['low']:
+                                df.iloc[i, df.columns.get_loc('psar_trend')] = 1  # Bullish
+                            else:
+                                df.iloc[i, df.columns.get_loc('psar_trend')] = -1  # Bearish
+                
+                # Show final statistics
+                self.console.print(f"Bullish (PSAR below price) count: {(df['psar_trend'] == 1).sum()}")
+                self.console.print(f"Bearish (PSAR above price) count: {(df['psar_trend'] == -1).sum()}")
                 
                 self.console.print("[dim]PSAR calculation successful[/dim]")
             except Exception as psar_error:
@@ -211,8 +309,14 @@ class ETHEmaPsarBot:
             
             # Determine PSAR direction
             try:
-                # Calculate direction using pandas operations
-                df['psar_direction'] = np.where(df['psar'] < df['low'], 1, -1)  # 1 for bullish, -1 for bearish
+                # Use the psar_trend column we've already calculated instead of recalculating direction
+                if 'psar_trend' in df.columns and not df['psar_trend'].isna().any():
+                    df['psar_direction'] = df['psar_trend']
+                    self.console.print("[dim]Using pre-calculated PSAR direction[/dim]")
+                else:
+                    # Calculate direction using pandas operations
+                    df['psar_direction'] = np.where(df['psar'] < df['low'], 1, -1)  # 1 for bullish, -1 for bearish
+                    self.console.print("[dim]Calculated PSAR direction from price comparison[/dim]")
                 
                 # Calculate PSAR distance as percentage
                 df['psar_distance'] = np.where(
@@ -259,6 +363,30 @@ class ETHEmaPsarBot:
                 except Exception as change_error:
                     self.console.print(f"[yellow]Warning: Error checking PSAR direction change: {str(change_error)}[/yellow]")
                     # Continue anyway, this is not critical
+            
+            # Calculate EMA gap and rate of change metrics for counter-trend trading
+            try:
+                # Calculate the gap between EMAs (absolute value)
+                df['ema_gap'] = abs(df['ema_9'] - df['ema_20'])
+                
+                # Calculate the rate of change (ROC) of the gap over different periods
+                df['ema_gap_roc_1'] = df['ema_gap'].pct_change(1) * 100  # 1-period ROC
+                df['ema_gap_roc_3'] = df['ema_gap'].pct_change(3) * 100  # 3-period ROC
+                
+                # Calculate the acceleration (ROC of the ROC)
+                df['ema_gap_accel'] = df['ema_gap_roc_1'].pct_change(1) * 100
+                
+                # Determine if gap is widening or narrowing (boolean)
+                df['gap_widening'] = df['ema_gap'] > df['ema_gap'].shift(1)
+                
+                # Fill any NaN values that result from calculations
+                for col in ['ema_gap_roc_1', 'ema_gap_roc_3', 'ema_gap_accel']:
+                    df[col] = df[col].fillna(0)
+                
+                self.console.print("[dim]EMA gap and rate of change metrics calculated[/dim]")
+            except Exception as gap_error:
+                self.console.print(f"[yellow]Warning: Error calculating EMA gap metrics: {str(gap_error)}[/yellow]")
+                # Continue anyway, this is not critical
             
             # Force garbage collection after heavy calculations
             gc.collect()
@@ -376,7 +504,7 @@ class ETHEmaPsarBot:
                     time_since_direction_change = time.time() - self.psar_direction_change_time
                     self.console.print(f"Time since PSAR direction change: {time_since_direction_change:.1f}s")
                     
-                    # Reset direction change flag if it's been more than 1 hour
+                        # Reset direction change flag if it's been more than 1 hour
                     if time_since_direction_change > 3600:  # 1 hour
                         self.console.print("[yellow]PSAR direction change timed out (>1 hour)[/yellow]")
                         self.psar_direction_changed = False
@@ -394,66 +522,66 @@ class ETHEmaPsarBot:
                 # - EMAs are aligned bullishly (fast above slow)
                 # - Price movement is positive since direction change
                 if current_psar_direction == 1 and emas_bullish:
-                    # Calculate price movement since PSAR direction change
+                # Calculate price movement since PSAR direction change
                     price_movement = None
+                
+                if hasattr(self, 'psar_direction_change_time') and self.psar_direction_change_time:
+                    # Get a few candles ago to check price movement
+                    candles_ago = min(5, len(df) - 1)  # At most 5 candles back
+                    past_price = df.iloc[-candles_ago]['close']
+                    price_movement = ((current_ask / past_price) - 1) * 100
+                    self.console.print(f"Price movement since direction change: {price_movement:.2f}%")
+                
+                # Ensure price is moving in the right direction
+                if price_movement is None or price_movement > 0:  # Price moving up or undetermined
+                    signal = "BUY"
+                    reason = "PSAR turned bullish with EMAs aligned and price moving up"
                     
-                    if hasattr(self, 'psar_direction_change_time') and self.psar_direction_change_time:
-                        # Get a few candles ago to check price movement
-                        candles_ago = min(5, len(df) - 1)  # At most 5 candles back
-                        past_price = df.iloc[-candles_ago]['close']
-                        price_movement = ((current_ask / past_price) - 1) * 100
-                        self.console.print(f"Price movement since direction change: {price_movement:.2f}%")
+                    self.console.print(f"[bold green]✓ BUY SIGNAL TRIGGERED (PSAR Direction Change)![/bold green]")
+                    self.console.print(f"[green]Will buy at: {current_ask}[/green]")
+                    self.console.print(f"[yellow]Reason: {reason}[/yellow]")
                     
-                    # Ensure price is moving in the right direction
-                    if price_movement is None or price_movement > 0:  # Price moving up or undetermined
-                        signal = "BUY"
-                        reason = "PSAR turned bullish with EMAs aligned and price moving up"
-                        
-                        self.console.print(f"[bold green]✓ BUY SIGNAL TRIGGERED (PSAR Direction Change)![/bold green]")
-                        self.console.print(f"[green]Will buy at: {current_ask}[/green]")
-                        self.console.print(f"[yellow]Reason: {reason}[/yellow]")
-                        
-                        # Reset PSAR direction change flag to prevent multiple signals
-                        self.psar_direction_changed = False
-                        self.save_state()
+                    # Reset PSAR direction change flag to prevent multiple signals
+                    self.psar_direction_changed = False
+                    self.save_state()
                         
                         # Store reason for logging
-                        self.last_signal_reason = reason
-                        
-                        return signal, reason
-                
+                    self.last_signal_reason = reason
+                    
+                    return signal, reason
+            
                 # For SELL signal, we want:
                 # - PSAR is above price (bearish)
                 # - EMAs are aligned bearishly (fast below slow)
                 # - Price movement is negative since direction change
                 elif current_psar_direction == -1 and emas_bearish:
-                    # Calculate price movement since PSAR direction change
+                # Calculate price movement since PSAR direction change
                     price_movement = None
+                
+                if hasattr(self, 'psar_direction_change_time') and self.psar_direction_change_time:
+                    # Get a few candles ago to check price movement
+                    candles_ago = min(5, len(df) - 1)  # At most 5 candles back
+                    past_price = df.iloc[-candles_ago]['close']
+                    price_movement = ((current_ask / past_price) - 1) * 100
+                    self.console.print(f"Price movement since direction change: {price_movement:.2f}%")
+                
+                # Ensure price is moving in the right direction
+                if price_movement is None or price_movement < 0:  # Price moving down or undetermined
+                    signal = "SELL"
+                    reason = "PSAR turned bearish with EMAs aligned and price moving down"
                     
-                    if hasattr(self, 'psar_direction_change_time') and self.psar_direction_change_time:
-                        # Get a few candles ago to check price movement
-                        candles_ago = min(5, len(df) - 1)  # At most 5 candles back
-                        past_price = df.iloc[-candles_ago]['close']
-                        price_movement = ((current_ask / past_price) - 1) * 100
-                        self.console.print(f"Price movement since direction change: {price_movement:.2f}%")
+                    self.console.print(f"[bold red]✓ SELL SIGNAL TRIGGERED (PSAR Direction Change)![/bold red]")
+                    self.console.print(f"[green]Will sell at: {current_bid}[/green]")
+                    self.console.print(f"[yellow]Reason: {reason}[/yellow]")
                     
-                    # Ensure price is moving in the right direction
-                    if price_movement is None or price_movement < 0:  # Price moving down or undetermined
-                        signal = "SELL"
-                        reason = "PSAR turned bearish with EMAs aligned and price moving down"
+                    # Reset PSAR direction change flag to prevent multiple signals
+                    self.psar_direction_changed = False
+                    self.save_state()
                         
-                        self.console.print(f"[bold red]✓ SELL SIGNAL TRIGGERED (PSAR Direction Change)![/bold red]")
-                        self.console.print(f"[green]Will sell at: {current_bid}[/green]")
-                        self.console.print(f"[yellow]Reason: {reason}[/yellow]")
-                        
-                        # Reset PSAR direction change flag to prevent multiple signals
-                        self.psar_direction_changed = False
-                        self.save_state()
-                        
-                        # Store reason for logging
-                        self.last_signal_reason = reason
-                        
-                        return signal, reason
+                    # Store reason for logging
+                    self.last_signal_reason = reason
+                    
+                    return signal, reason
             
             # Additional signals based on PSAR distance from price
             # For BUY, PSAR is below price, far enough away, and EMAs are bullish
@@ -502,6 +630,17 @@ class ETHEmaPsarBot:
         self.last_position_update = 0  # Track when we last updated position info
         self.last_mt5_check = time.time()  # Track when we last checked MT5 connection
         self.consecutive_errors = 0  # Track consecutive errors for backoff
+        
+        # Make sure we have a valid active symbol
+        if not self._find_valid_eth_symbol():
+            self.console.print("[yellow]Could not find main ETH symbol, attempting to use a placeholder...[/yellow]")
+            
+            # If we can't find a working symbol, set a placeholder but continue
+            self.active_symbol = self.symbol
+            self.console.print(f"[yellow]Using placeholder symbol: {self.active_symbol}[/yellow]")
+            self.console.print("[yellow]Will attempt to work with symbol data even if unavailable in broker[/yellow]")
+        else:
+            self.console.print(f"[green]Using symbol: {self.active_symbol}[/green]")
         
         # For debugging: add a main loop counter
         loop_count = 0
@@ -589,11 +728,59 @@ class ETHEmaPsarBot:
                             self.console.print(f"[dim]Checking exit conditions for position #{position.ticket}...[/dim]")
                             
                             # Check exit conditions but don't terminate the process
-                            # check_exit_conditions now returns bool to indicate if an action was taken
-                            action_taken = self.check_exit_conditions(df, position)
+                            # check_exit_conditions now returns tuple: (action_type, exit_portion, reason)
+                            exit_result = self.check_exit_conditions(df, position)
                             
                             # Log the result of checking exit conditions
-                            self.console.print(f"[dim]Exit check result: action_taken = {action_taken}[/dim]")
+                            self.console.print(f"[dim]Exit check result: exit_result = {exit_result}[/dim]")
+                            
+                            action_taken = False
+                            if exit_result[0] is not None:
+                                action_type, exit_portion, reason = exit_result
+                                
+                                if action_type == "PARTIAL_EXIT":
+                                    self.console.print(f"[yellow]Executing partial exit ({exit_portion*100}%) due to: {reason}[/yellow]")
+                                    exit_success = self.execute_partial_exit(position, exit_portion, reason)
+                                    if exit_success:
+                                        self.console.print("[green]Partial exit executed successfully[/green]")
+                                        
+                                        # Track this partial exit in our internal state
+                                        pos_id = position.ticket
+                                        if pos_id not in self.partial_exits_taken:
+                                            self.partial_exits_taken[pos_id] = []
+                                        
+                                        self.partial_exits_taken[pos_id].append({
+                                            "exit_percentage": exit_portion,
+                                            "time": datetime.now(),
+                                            "reason": reason
+                                        })
+                                        
+                                        self.save_state()  # Save state to persist between restarts
+                                        action_taken = True
+                                    else:
+                                        self.console.print("[red]Partial exit execution failed![/red]")
+                                
+                                elif action_type == "EXIT":
+                                    self.console.print(f"[yellow]Executing full exit due to: {reason}[/yellow]")
+                                    exit_success = self.close_position(position, reason)
+                                    if exit_success:
+                                        self.console.print("[green]Full exit executed successfully[/green]")
+                                        action_taken = True
+                                    else:
+                                        self.console.print("[red]Full exit execution failed![/red]")
+                            
+                            # If no action was taken for the main position, check for counter-trend opportunities
+                            if not action_taken:
+                                counter_signal = self.check_for_counter_trend_opportunity(df, position)
+                                
+                                if counter_signal:
+                                    self.console.print(f"[bold]Detected counter-trend {counter_signal} opportunity against position #{position.ticket}[/bold]")
+                                    counter_result = self.execute_counter_trend_trade(counter_signal, df, position)
+                                    
+                                    if counter_result:
+                                        self.console.print(f"[green]Successfully executed counter-trend {counter_signal} trade[/green]")
+                                    else:
+                                        self.console.print(f"[yellow]Failed to execute counter-trend {counter_signal} trade[/yellow]")
                             
                             # Log any actions that were taken
                             if action_taken:
@@ -639,6 +826,10 @@ class ETHEmaPsarBot:
                 
                 # Reset consecutive errors counter on successful execution
                 self.consecutive_errors = 0
+                
+                # Check and update counter-trend positions status
+                if self.counter_trend_active:
+                    self.check_counter_trend_positions()
                 
                 # Sleep for a short time to avoid hammering the system
                 self.console.print("[dim]Sleeping before next iteration...[/dim]")
@@ -696,13 +887,61 @@ class ETHEmaPsarBot:
             # Force garbage collection before fetching data
             gc.collect()
             
+            # Make sure we're using the active symbol that works
+            if self.active_symbol is None:
+                if not self._find_valid_eth_symbol():
+                    # If we still can't find a working symbol, use the default symbol but warn
+                    self.active_symbol = self.symbol
+                    self.console.print(f"[yellow]Using default symbol {self.active_symbol} despite issues[/yellow]")
+                    
+            symbol_to_use = self.active_symbol
+            self.console.print(f"[dim]Using symbol: {symbol_to_use}[/dim]")
+            
             # Request a reduced amount of data to prevent memory issues
             # 2000 candles should be more than enough for PSAR and EMA calculations
-            rates = mt5.copy_rates_from_pos(self.symbol, self.timeframe, 0, 2000)  # Reduced from 5000
+            rates = mt5.copy_rates_from_pos(symbol_to_use, self.timeframe, 0, 2000)
             
             if rates is None:
                 error_code = mt5.last_error()
                 self.console.print(f"[red]Failed to get market data. MT5 error code: {error_code}[/red]")
+                
+                # If we can't get data for the active symbol, try a test symbol to check connection
+                test_symbol = "EURUSD"  # This is almost always available
+                test_rates = mt5.copy_rates_from_pos(test_symbol, self.timeframe, 0, 10)
+                
+                if test_rates is not None:
+                    self.console.print(f"[yellow]Connection works with {test_symbol} but {symbol_to_use} is unavailable[/yellow]")
+                    
+                    # Create a synthetic empty dataframe with minimal required columns for testing
+                    self.console.print("[yellow]Creating synthetic data for testing purposes[/yellow]")
+                    
+                    # Create a minimal synthetic dataframe for testing purposes
+                    now = datetime.now()
+                    synthetic_data = []
+                    
+                    for i in range(200):  # Create 200 candles
+                        candle_time = now - timedelta(minutes=15 * i)
+                        # Simple oscillation around 3200 for testing
+                        close_price = 3200 + 50 * math.sin(i / 10)
+                        # Create some variation in high/low
+                        high_price = close_price + random.uniform(5, 15)
+                        low_price = close_price - random.uniform(5, 15)
+                        synthetic_data.append({
+                            'time': candle_time.timestamp(),
+                            'open': close_price - random.uniform(-10, 10),
+                            'high': high_price,
+                            'low': low_price,
+                            'close': close_price,
+                            'tick_volume': random.randint(100, 1000)
+                        })
+                    
+                    # Convert to dataframe
+                    df = pd.DataFrame(synthetic_data)
+                    df['time'] = pd.to_datetime(df['time'], unit='s')
+                    
+                    self.console.print("[yellow]Created synthetic data for testing[/yellow]")
+                    return df
+                
                 return None
                 
             self.console.print(f"[dim]Received {len(rates)} candles from MT5[/dim]")
@@ -738,13 +977,32 @@ class ETHEmaPsarBot:
             last_row = df.iloc[-1]
             
             # Get current price for entry
-            price = mt5.symbol_info_tick(self.symbol).ask if signal == "BUY" else mt5.symbol_info_tick(self.symbol).bid
+            symbol_to_use = self.active_symbol or self.symbol
+            tick_info = mt5.symbol_info_tick(symbol_to_use)
+            
+            if tick_info is None:
+                self.console.print(f"[red]Could not get tick information for {symbol_to_use}[/red]")
+                return False
+                
+            price = tick_info.ask if signal == "BUY" else tick_info.bid
             
             # Calculate PSAR-based stop loss distance (1.5x the PSAR distance for safety)
             sl_distance_pct = last_row['psar_distance'] * 1.5
             
-            # Calculate stop loss price
-            sl_price = price * (1 - sl_distance_pct/100) if signal == "BUY" else price * (1 + sl_distance_pct/100)
+            # Ensure minimum SL distance is at least 1%
+            sl_distance_pct = max(sl_distance_pct, 1.0)
+            
+            # Make sure SL distance is positive
+            sl_distance_pct = abs(sl_distance_pct)
+            
+            # Calculate stop loss price - ALWAYS place SL in the correct direction
+            if signal == "BUY":
+                # For BUY orders, SL must be BELOW entry price
+                sl_price = price * (1 - sl_distance_pct/100)
+            else:  # SELL
+                # For SELL orders, SL must be ABOVE entry price
+                sl_price = price * (1 + sl_distance_pct/100)
+                
             sl_price = round(sl_price, 2)  # Round to 2 decimal places
             
             # Calculate multiple exit points (percentage-based)
@@ -760,6 +1018,18 @@ class ETHEmaPsarBot:
             tp1_price = round(tp1_price, 2)
             tp2_price = round(tp2_price, 2)
             tp3_price = round(tp3_price, 2)
+            
+            # Double-check that SL is in the correct direction relative to entry price
+            if signal == "BUY" and sl_price >= price:
+                self.console.print(f"[red]Error: Stop loss ({sl_price}) must be below entry price ({price}) for BUY orders[/red]")
+                # Correct the stop loss to be below entry price
+                sl_price = price * 0.99  # Set SL 1% below entry price
+                self.console.print(f"[yellow]Corrected stop loss to {sl_price:.2f}[/yellow]")
+            elif signal == "SELL" and sl_price <= price:
+                self.console.print(f"[red]Error: Stop loss ({sl_price}) must be above entry price ({price}) for SELL orders[/red]")
+                # Correct the stop loss to be above entry price
+                sl_price = price * 1.01  # Set SL 1% above entry price
+                self.console.print(f"[yellow]Corrected stop loss to {sl_price:.2f}[/yellow]")
             
             # Display the trade setup
             self.console.print("[bold cyan]Trade Setup:[/bold cyan]")
@@ -782,14 +1052,14 @@ class ETHEmaPsarBot:
             # Create the trade request
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": self.symbol,
+                "symbol": symbol_to_use,
                 "volume": self.lot_size,
                 "type": order_type,
                 "price": price,
                 "sl": sl_price,
                 "deviation": 20,
                 "magic": 234000,
-                "comment": "ETH EMA-PSAR",
+                "comment": "ETH-BOT",  # Simplified comment
                 "type_filling": mt5.ORDER_FILLING_IOC,
                 "type_time": mt5.ORDER_TIME_GTC
             }
@@ -816,7 +1086,7 @@ class ETHEmaPsarBot:
                     "timestamp": datetime.now().isoformat()
                 }
                 self.log_trade(trade_data)
-                return
+                return False
             
             # Check if trade was executed successfully
             if result.retcode != mt5.TRADE_RETCODE_DONE:
@@ -833,6 +1103,7 @@ class ETHEmaPsarBot:
                     "timestamp": datetime.now().isoformat()
                 }
                 self.log_trade(trade_data)
+                return False
             else:
                 # Get the new position's ticket (ID)
                 position_id = result.order
@@ -878,362 +1149,162 @@ class ETHEmaPsarBot:
                 }
                 self.log_trade(trade_data)
                 
+                return True
+            
         except Exception as e:
             self.console.print(f"[red]Error executing trade: {str(e)}[/red]")
             import traceback
             self.console.print(f"[red]{traceback.format_exc()}[/red]")
+            return False
 
     def check_exit_conditions(self, df, position):
         """Check if any exit conditions are met for an open position"""
         try:
-            # Get position details
-            position_type = position.type  # 0 for buy, 1 for sell
-            position_key = str(position.ticket)  # Convert ticket to string for dictionary key
+            # Use the active symbol for exit conditions
+            symbol_to_use = self.active_symbol if self.active_symbol else self.symbol
             
-            # Initialize entry in partial_exits_taken if it doesn't exist
-            if not hasattr(self, 'partial_exits_taken'):
-                self.partial_exits_taken = {}
-            if position_key not in self.partial_exits_taken:
-                self.partial_exits_taken[position_key] = set()
+            # Get current price data
+            current_row = df.iloc[-1]
             
-            # Calculate current profit percentage
-            entry_price = position.price_open
-            current_price = position.price_current
-            profit_pct = ((current_price / entry_price) - 1) * 100
-            if position_type == mt5.ORDER_TYPE_SELL:
-                profit_pct = -profit_pct
+            # Get MT5 current price (more accurate than OHLC)
+            tick = mt5.symbol_info_tick(symbol_to_use)
             
-            # Get latest data for indicator-based exits
-            last_row = df.iloc[-1]
-            prev_row = df.iloc[-2] if len(df) > 1 else None
-            
-            # Display position info for analysis
-            self.console.print("\n=== Exit Analysis ===")
-            self.console.print(f"Position Type: {'BUY' if position_type == mt5.ORDER_TYPE_BUY else 'SELL'}")
-            self.console.print(f"Entry Price: {entry_price}")
-            self.console.print(f"Current Price: {current_price}")
-            self.console.print(f"Current Profit: {profit_pct:.2f}%")
-            
-            # Check for indicator-based exit conditions
-            ema_cross_against = False
-            psar_flip_against = False
-            trailing_stop_hit = False
-            
-            # Check for EMA crossover against position
-            if prev_row is not None:
-                if position_type == mt5.ORDER_TYPE_BUY:
-                    # For long positions, bearish crossover is against us
-                    ema_cross_against = (prev_row['ema_9'] > prev_row['ema_20'] and 
-                                         last_row['ema_9'] < last_row['ema_20'])
-                else:
-                    # For short positions, bullish crossover is against us
-                    ema_cross_against = (prev_row['ema_9'] < prev_row['ema_20'] and 
-                                         last_row['ema_9'] > last_row['ema_20'])
-            
-            # Check for PSAR flip against position
-            if position_type == mt5.ORDER_TYPE_BUY:
-                # For long positions, PSAR above price is against us
-                psar_flip_against = last_row['psar_direction'] == -1
+            if tick is None:
+                # Use dataframe price if we can't get tick data (for testing)
+                self.console.print(f"[yellow]Couldn't get current price for {symbol_to_use}, using dataframe price[/yellow]")
+                
+                if position.type == 0:  # BUY position
+                    current_price = current_row['close']
+                else:  # SELL position
+                    current_price = current_row['close']
             else:
-                # For short positions, PSAR below price is against us
-                psar_flip_against = last_row['psar_direction'] == 1
+                # Use actual bid/ask price from MT5
+                if position.type == 0:  # BUY position
+                    current_price = tick.bid  # We sell at bid price when closing buy positions
+                else:  # SELL position
+                    current_price = tick.ask  # We buy at ask price when closing sell positions
             
-            # Check if trailing stop is hit
-            if position_type == mt5.ORDER_TYPE_BUY:
-                # For long positions, trailing stop is hit when price falls below PSAR
-                trailing_stop_hit = current_price < last_row['psar']
-            else:
-                # For short positions, trailing stop is hit when price rises above PSAR
-                trailing_stop_hit = current_price > last_row['psar']
+            # Get PSAR direction and value
+            psar = current_row['psar']
+            psar_direction = current_row['psar_direction']
             
-            # Define take-profit levels
-            take_profit_1 = 0.3  # 0.3% for first exit
-            take_profit_2 = 0.5  # 0.5% for second exit
-            take_profit_3 = 0.7  # 0.7% for third exit
+            # Extract original position open price
+            open_price = position.price_open
             
-            # Display take-profit levels and current status
-            self.console.print("\nTake-Profit Levels:")
-            self.console.print(f"TP1 (0.3%): {'Reached' if profit_pct >= take_profit_1 else 'Not reached'} | Executed: {'Yes' if 'exit1' in self.partial_exits_taken[position_key] else 'No'}")
-            self.console.print(f"TP2 (0.5%): {'Reached' if profit_pct >= take_profit_2 else 'Not reached'} | Executed: {'Yes' if 'exit2' in self.partial_exits_taken[position_key] else 'No'}")
-            self.console.print(f"TP3 (0.7%): {'Reached' if profit_pct >= take_profit_3 else 'Not reached'} | Executed: {'Yes' if 'exit3' in self.partial_exits_taken[position_key] else 'No'}")
+            # Calculate profit percentage
+            if position.type == 0:  # BUY position
+                profit_percent = ((current_price / open_price) - 1) * 100
+            else:  # SELL position
+                profit_percent = ((open_price / current_price) - 1) * 100
             
-            # Check if we've completed all partial exits and need to use trailing stop for remainder
-            all_exits_completed = all(exit_key in self.partial_exits_taken[position_key] for exit_key in ['exit1', 'exit2', 'exit3'])
+            # Print status with more information
+            position_type = "LONG" if position.type == 0 else "SHORT"
+            self.console.print("\n[bold]Position Status[/bold]")
+            self.console.print(f"Type: {position_type}")
+            self.console.print(f"Open Price: {open_price:.2f}")
+            self.console.print(f"Current Price: {current_price:.2f}")
+            self.console.print(f"Profit/Loss: {profit_percent:.2f}%")
+            self.console.print(f"PSAR: {psar:.2f}")
+            self.console.print(f"PSAR Direction: {psar_direction}")
             
-            # Get current stop loss level
-            current_sl = position.sl
+            # Get position ticket for tracking partial exits
+            position_ticket = position.ticket
             
-            # Display exit conditions
-            self.console.print("\nExit Conditions:")
-            self.console.print(f"EMA Cross Against: {'Yes' if ema_cross_against else 'No'}")
-            self.console.print(f"PSAR Flip Against: {'Yes' if psar_flip_against else 'No'}")
-            self.console.print(f"Trailing Stop Hit: {'Yes' if trailing_stop_hit else 'No'}")
-            self.console.print(f"All Partial Exits Completed: {'Yes' if all_exits_completed else 'No'}")
+            # Check if we've already taken partial exits for this position
+            taken_exits = []
+            if position_ticket in self.partial_exits_taken:
+                taken_exits = [exit_data["exit_percentage"] for exit_data in self.partial_exits_taken[position_ticket]]
+                
+                # Show which partial exits were already taken
+                self.console.print(f"Partial exits already taken: {[f'{exit*100:.1f}%' for exit in taken_exits]}")
             
-            # Track if we executed any actions
-            action_executed = False
-            
-            # Check for trailing stop after all partial exits
-            if all_exits_completed:
-                # Define trailing stop levels after all partial exits
-                trailing_levels = [
-                    {"level": 0.9, "sl_pct": 0.7},  # When price reaches 0.9%, move SL to 0.7%
-                    {"level": 1.1, "sl_pct": 0.9},  # When price reaches 1.1%, move SL to 0.9%
-                    {"level": 1.3, "sl_pct": 1.1},  # When price reaches 1.3%, move SL to 1.1%
-                    {"level": 1.5, "sl_pct": 1.3},  # When price reaches 1.5%, move SL to 1.3%
+            # For backward compatibility with older state files
+            position_key = str(position.ticket)
+            if hasattr(self, 'partial_exits_taken') and isinstance(self.partial_exits_taken, dict) and \
+               position_key in self.partial_exits_taken and isinstance(self.partial_exits_taken[position_key], set):
+                # Legacy format using 'exit1', 'exit2' strings
+                legacy_exits = self.partial_exits_taken[position_key]
+                if 'exit1' in legacy_exits:
+                    taken_exits.append(0.3)
+                if 'exit2' in legacy_exits:
+                    taken_exits.append(0.5)
+                if 'exit3' in legacy_exits:
+                    taken_exits.append(0.7)
+                if 'exit_full' in legacy_exits:  # Complete exit marker
+                    taken_exits.append(1.0)
+                
+                # Convert to new format
+                self.partial_exits_taken[position_ticket] = [
+                    {"exit_percentage": exit_value, "time": datetime.now(), "reason": "Migrated from legacy format"}
+                    for exit_value in taken_exits
                 ]
                 
-                # Sort levels from highest to lowest for proper checking
-                if position_type == mt5.ORDER_TYPE_BUY:
-                    trailing_levels = sorted(trailing_levels, key=lambda x: x["level"], reverse=True)
-                else:  # For SELL positions, check lowest levels first
-                    trailing_levels = sorted(trailing_levels, key=lambda x: x["level"])
+                # Clean up old format
+                if position_key != position_ticket:
+                    del self.partial_exits_taken[position_key]
                 
-                # Check if we need to update the trailing stop
-                for level_data in trailing_levels:
-                    level = level_data["level"]
-                    sl_pct = level_data["sl_pct"]
-                    
-                    # Calculate new SL price based on entry price and SL percentage
-                    if position_type == mt5.ORDER_TYPE_BUY:
-                        new_sl_price = entry_price * (1 + sl_pct/100)
-                        # Only update if price has reached the level and new SL is higher than current SL
-                        if profit_pct >= level and (current_sl is None or new_sl_price > current_sl):
-                            self.console.print(f"[bold green]Updating trailing stop: {sl_pct:.2f}% ({new_sl_price:.2f})[/bold green]")
-                            
-                            # Update SL in MT5
-                            request = {
-                                "action": mt5.TRADE_ACTION_SLTP,
-                                "symbol": self.symbol,
-                                "position": position.ticket,
-                                "sl": new_sl_price,
-                                "tp": position.tp  # Keep TP unchanged
-                            }
-                            
-                            result = mt5.order_send(request)
-                            if result.retcode == mt5.TRADE_RETCODE_DONE:
-                                self.console.print(f"[green]Trailing stop updated to {new_sl_price:.2f}[/green]")
-                                return True  # Action executed
-                            else:
-                                self.console.print(f"[red]Failed to update trailing stop: {result.comment}[/red]")
-                            
-                            break  # Only try to set the highest applicable level
-                    else:  # SELL position
-                        new_sl_price = entry_price * (1 - sl_pct/100)
-                        # Only update if price has reached the level and new SL is lower than current SL
-                        if profit_pct >= level and (current_sl is None or new_sl_price < current_sl):
-                            self.console.print(f"[bold green]Updating trailing stop: {sl_pct:.2f}% ({new_sl_price:.2f})[/bold green]")
-                            
-                            # Update SL in MT5
-                            request = {
-                                "action": mt5.TRADE_ACTION_SLTP,
-                                "symbol": self.symbol,
-                                "position": position.ticket,
-                                "sl": new_sl_price,
-                                "tp": position.tp  # Keep TP unchanged
-                            }
-                            
-                            result = mt5.order_send(request)
-                            if result.retcode == mt5.TRADE_RETCODE_DONE:
-                                self.console.print(f"[green]Trailing stop updated to {new_sl_price:.2f}[/green]")
-                                return True  # Action executed
-                            else:
-                                self.console.print(f"[red]Failed to update trailing stop: {result.comment}[/red]")
-                            
-                            break  # Only try to set the highest applicable level
+                self.console.print("[yellow]Migrated partial exit tracking to new format[/yellow]")
+            
+            # Logic for LONG position exit
+            if position.type == 0:  # LONG position
                 
-                # Immediately after third exit, set SL to the second exit level (0.5%)
-                trailing_sl_key = f"trailing_sl_set_{position_key}"
-                if not hasattr(self, trailing_sl_key) or not getattr(self, trailing_sl_key, False):
-                    if position_type == mt5.ORDER_TYPE_BUY:
-                        new_sl_price = entry_price * (1 + take_profit_2/100)  # Set to TP2 level (0.5%)
-                    else:  # SELL position
-                        new_sl_price = entry_price * (1 - take_profit_2/100)  # Set to TP2 level (0.5%)
-                    
-                    # Only update if current SL is below/above the new SL
-                    if current_sl is None or (position_type == mt5.ORDER_TYPE_BUY and new_sl_price > current_sl) or \
-                                            (position_type == mt5.ORDER_TYPE_SELL and new_sl_price < current_sl):
-                        self.console.print(f"[bold green]Setting initial trailing stop after all exits: {take_profit_2:.2f}% ({new_sl_price:.2f})[/bold green]")
-                        
-                        # Update SL in MT5
-                        request = {
-                            "action": mt5.TRADE_ACTION_SLTP,
-                            "symbol": self.symbol,
-                            "position": position.ticket,
-                            "sl": new_sl_price,
-                            "tp": position.tp  # Keep TP unchanged
-                        }
-                        
-                        result = mt5.order_send(request)
-                        if result.retcode == mt5.TRADE_RETCODE_DONE:
-                            self.console.print(f"[green]Initial trailing stop set to {new_sl_price:.2f}[/green]")
-                            # Mark that we've set the initial trailing SL
-                            setattr(self, trailing_sl_key, True)
-                            self.save_state()  # Save the state to persist this setting
-                            return True  # Action executed
-                        else:
-                            self.console.print(f"[red]Failed to set initial trailing stop: {result.comment}[/red]")
+                # Check for partial exit at 0.3% profit if not already taken
+                if profit_percent >= 0.3 and 0.3 not in taken_exits:
+                    self.console.print("[yellow]Exit condition met: 0.3% partial profit target reached[/yellow]")
+                    # Take 30% partial profit
+                    return "PARTIAL_EXIT", 0.3, "0.3% Partial Take Profit"
+                
+                # Check for partial exit at 0.5% profit if not already taken
+                if profit_percent >= 0.5 and 0.5 not in taken_exits:
+                    self.console.print("[yellow]Exit condition met: 0.5% partial profit target reached[/yellow]")
+                    # Take 50% partial profit (of the remaining position)
+                    return "PARTIAL_EXIT", 0.5, "0.5% Partial Take Profit"
+                
+                # Technical exit condition: PSAR above the close price (trend reversal)
+                # Only if we've already taken partial exits
+                if psar_direction == "Bearish" and taken_exits:
+                    self.console.print("[yellow]Exit condition met: PSAR turned bearish after taking partial exits[/yellow]")
+                    return "EXIT", 1.0, "PSAR Trend Reversal Exit"
             
-            # Check for full exit conditions based on indicators
-            if ema_cross_against or psar_flip_against or trailing_stop_hit:
-                reason = []
-                if ema_cross_against:
-                    reason.append("EMA Crossover Against Position")
-                if psar_flip_against:
-                    reason.append("PSAR Flipped Against Position")
-                if trailing_stop_hit:
-                    reason.append("Trailing Stop Hit")
-                    
-                exit_reason = ", ".join(reason)
-                self.console.print(f"[bold yellow]Executing full exit due to: {exit_reason}[/bold yellow]")
-                result = self.close_position(position, exit_reason)
-                if result:
-                    self.console.print("[green]Full exit execution successful[/green]")
-                    action_executed = True
-                else:
-                    self.console.print("[red]Full exit execution failed![/red]")
+            # Logic for SHORT position exit
+            else:  # SHORT position
+                
+                # Check for partial exit at 0.3% profit if not already taken
+                if profit_percent >= 0.3 and 0.3 not in taken_exits:
+                    self.console.print("[yellow]Exit condition met: 0.3% partial profit target reached[/yellow]")
+                    # Take 30% partial profit
+                    return "PARTIAL_EXIT", 0.3, "0.3% Partial Take Profit"
+                
+                # Check for partial exit at 0.5% profit if not already taken
+                if profit_percent >= 0.5 and 0.5 not in taken_exits:
+                    self.console.print("[yellow]Exit condition met: 0.5% partial profit target reached[/yellow]")
+                    # Take 50% partial profit (of the remaining position)
+                    return "PARTIAL_EXIT", 0.5, "0.5% Partial Take Profit"
+                
+                # Technical exit condition: PSAR below the close price (trend reversal)
+                # Only if we've already taken partial exits
+                if psar_direction == "Bullish" and taken_exits:
+                    self.console.print("[yellow]Exit condition met: PSAR turned bullish after taking partial exits[/yellow]")
+                    return "EXIT", 1.0, "PSAR Trend Reversal Exit"
             
-            # Check take-profit levels and execute partial exits
-            if position_type == mt5.ORDER_TYPE_BUY or position_type == mt5.ORDER_TYPE_SELL:
-                # First take-profit level (exit 30% of position)
-                if profit_pct >= take_profit_1 and "exit1" not in self.partial_exits_taken[position_key]:
-                    self.console.print(f"[bold green]TP1 triggered! Profit: {profit_pct:.2f}% >= {take_profit_1}%[/bold green]")
-                    result = self.execute_partial_exit(position, 0.3, f"Take Profit 1 ({take_profit_1}%)")
-                    if result:
-                        self.console.print("[green]TP1 execution successful, updating state...[/green]")
-                        self.partial_exits_taken[position_key].add("exit1")
-                        
-                        # Update SL to breakeven (or small positive) after TP1 execution
-                        # Use a small buffer (e.g., 0.1%) to account for spread and fees
-                        buffer_pct = 0.1
-                        if position_type == mt5.ORDER_TYPE_BUY:
-                            new_sl_price = entry_price * (1 + buffer_pct/100)  # Slightly above entry
-                        else:  # SELL position
-                            new_sl_price = entry_price * (1 - buffer_pct/100)  # Slightly below entry
-                        
-                        # Only update if current SL is below/above the new SL
-                        current_sl = position.sl
-                        if current_sl is None or (position_type == mt5.ORDER_TYPE_BUY and new_sl_price > current_sl) or \
-                                                (position_type == mt5.ORDER_TYPE_SELL and new_sl_price < current_sl):
-                            self.console.print(f"[bold green]Updating SL after TP1 to breakeven+: {buffer_pct:.2f}% ({new_sl_price:.2f})[/bold green]")
-                            
-                            # Update SL in MT5
-                            request = {
-                                "action": mt5.TRADE_ACTION_SLTP,
-                                "symbol": self.symbol,
-                                "position": position.ticket,
-                                "sl": new_sl_price,
-                                "tp": position.tp  # Keep TP unchanged
-                            }
-                            
-                            sl_result = mt5.order_send(request)
-                            if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
-                                self.console.print(f"[green]SL updated to {new_sl_price:.2f} after TP1[/green]")
-                            else:
-                                self.console.print(f"[red]Failed to update SL after TP1: {sl_result.comment}[/red]")
-                        
-                        self.save_state()  # Save state to persist between restarts
-                        action_executed = True
-                    else:
-                        self.console.print("[red]TP1 execution failed![/red]")
-                    
-                # Second take-profit level (exit another 30% of position)
-                elif profit_pct >= take_profit_2 and "exit2" not in self.partial_exits_taken[position_key] and "exit1" in self.partial_exits_taken[position_key]:
-                    self.console.print(f"[bold green]TP2 triggered! Profit: {profit_pct:.2f}% >= {take_profit_2}%[/bold green]")
-                    result = self.execute_partial_exit(position, 0.3, f"Take Profit 2 ({take_profit_2}%)")
-                    if result:
-                        self.console.print("[green]TP2 execution successful, updating state...[/green]")
-                        self.partial_exits_taken[position_key].add("exit2")
-                        
-                        # Update SL to TP1 level after TP2 execution
-                        if position_type == mt5.ORDER_TYPE_BUY:
-                            new_sl_price = entry_price * (1 + take_profit_1/100)  # Set to TP1 level (0.3%)
-                        else:  # SELL position
-                            new_sl_price = entry_price * (1 - take_profit_1/100)  # Set to TP1 level (0.3%)
-                        
-                        # Only update if current SL is below/above the new SL
-                        current_sl = position.sl
-                        if current_sl is None or (position_type == mt5.ORDER_TYPE_BUY and new_sl_price > current_sl) or \
-                                                (position_type == mt5.ORDER_TYPE_SELL and new_sl_price < current_sl):
-                            self.console.print(f"[bold green]Updating SL after TP2 to TP1 level: {take_profit_1:.2f}% ({new_sl_price:.2f})[/bold green]")
-                            
-                            # Update SL in MT5
-                            request = {
-                                "action": mt5.TRADE_ACTION_SLTP,
-                                "symbol": self.symbol,
-                                "position": position.ticket,
-                                "sl": new_sl_price,
-                                "tp": position.tp  # Keep TP unchanged
-                            }
-                            
-                            sl_result = mt5.order_send(request)
-                            if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
-                                self.console.print(f"[green]SL updated to {new_sl_price:.2f} after TP2[/green]")
-                            else:
-                                self.console.print(f"[red]Failed to update SL after TP2: {sl_result.comment}[/red]")
-                        
-                        self.save_state()
-                        action_executed = True
-                    else:
-                        self.console.print("[red]TP2 execution failed![/red]")
-                    
-                # Third take-profit level (exit remaining 40% of position)
-                elif profit_pct >= take_profit_3 and "exit3" not in self.partial_exits_taken[position_key] and "exit2" in self.partial_exits_taken[position_key]:
-                    self.console.print(f"[bold green]TP3 triggered! Profit: {profit_pct:.2f}% >= {take_profit_3}%[/bold green]")
-                    result = self.execute_partial_exit(position, 0.4, f"Take Profit 3 ({take_profit_3}%)")
-                    if result:
-                        self.console.print("[green]TP3 execution successful, updating state...[/green]")
-                        self.partial_exits_taken[position_key].add("exit3")
-                        
-                        # Update SL to TP2 level after TP3 execution
-                        if position_type == mt5.ORDER_TYPE_BUY:
-                            new_sl_price = entry_price * (1 + take_profit_2/100)  # Set to TP2 level (0.5%)
-                        else:  # SELL position
-                            new_sl_price = entry_price * (1 - take_profit_2/100)  # Set to TP2 level (0.5%)
-                        
-                        # Only update if current SL is below/above the new SL
-                        current_sl = position.sl
-                        if current_sl is None or (position_type == mt5.ORDER_TYPE_BUY and new_sl_price > current_sl) or \
-                                                (position_type == mt5.ORDER_TYPE_SELL and new_sl_price < current_sl):
-                            self.console.print(f"[bold green]Updating SL after TP3 to TP2 level: {take_profit_2:.2f}% ({new_sl_price:.2f})[/bold green]")
-                            
-                            # Update SL in MT5
-                            request = {
-                                "action": mt5.TRADE_ACTION_SLTP,
-                                "symbol": self.symbol,
-                                "position": position.ticket,
-                                "sl": new_sl_price,
-                                "tp": position.tp  # Keep TP unchanged
-                            }
-                            
-                            sl_result = mt5.order_send(request)
-                            if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
-                                self.console.print(f"[green]SL updated to {new_sl_price:.2f} after TP3[/green]")
-                            else:
-                                self.console.print(f"[red]Failed to update SL after TP3: {sl_result.comment}[/red]")
-                        
-                        self.save_state()
-                        action_executed = True
-                    else:
-                        self.console.print("[red]TP3 execution failed![/red]")
-            
-            # Final status update
-            self.console.print(f"[dim]Exit check complete. Action taken: {action_executed}[/dim]")
-            
-            # Return whether we executed any action (partial exit or full exit)
-            return action_executed
-            
+            # No exit conditions met
+            self.console.print("[green]No exit conditions met. Holding position.[/green]")
+            return None, 0, None
+        
         except Exception as e:
-            self.console.print(f"[red]Error checking exit conditions: {str(e)}[/red]")
+            self.console.print(f"[red]Error in check_exit_conditions: {str(e)}[/red]")
             import traceback
             self.console.print(f"[red]{traceback.format_exc()}[/red]")
-            return False
+            return None, 0, None
 
     def close_position(self, position, reason):
         """Close an entire position"""
         try:
+            # Make sure we're using the active symbol
+            symbol_to_use = self.active_symbol or self.symbol
+            
             # Get current price for closing
-            price = mt5.symbol_info_tick(self.symbol).bid if position.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(self.symbol).ask
+            price = mt5.symbol_info_tick(symbol_to_use).bid if position.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol_to_use).ask
             
             self.console.print(f"[yellow]Attempting to close position {position.ticket} at {price}...[/yellow]")
             
@@ -1243,7 +1314,7 @@ class ETHEmaPsarBot:
             
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": self.symbol,
+                "symbol": symbol_to_use,
                 "volume": position.volume,
                 "type": mt5.ORDER_TYPE_SELL if position.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
                 "position": position.ticket,
@@ -1275,7 +1346,7 @@ class ETHEmaPsarBot:
                 self.console.print(f"[red]Position close failed: {result.comment} (code {result.retcode})[/red]")
                 return False
             else:
-                current_price = mt5.symbol_info_tick(self.symbol).bid if position.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(self.symbol).ask
+                current_price = mt5.symbol_info_tick(symbol_to_use).bid if position.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol_to_use).ask
                 self.console.print(f"[green]Position closed: {position.volume} lots at {current_price}[/green]")
                 self.console.print(f"[green]Reason: {reason}[/green]")
                 self.console.print(f"[green]Profit: ${position.profit:.2f}[/green]")
@@ -1305,59 +1376,77 @@ class ETHEmaPsarBot:
         try:
             self.console.print(f"[bold yellow]Attempting to execute partial exit ({exit_portion*100}%) for position #{position.ticket}[/bold yellow]")
             
-            # Calculate volume to close
-            original_volume = position.volume
-            volume_to_close = position.volume * exit_portion
+            # Make sure we're using the active symbol
+            symbol_to_use = self.active_symbol or self.symbol
             
-            # Round volume to broker's requirements (usually 0.01 is minimum)
-            # Most brokers require 0.01 lot steps
-            volume_to_close = round(volume_to_close, 2)
-            
-            # Ensure volume is at least the minimum (0.01 lots)
-            if volume_to_close < 0.01:
-                volume_to_close = 0.01
-                self.console.print("[yellow]Warning: Adjusted partial exit volume to minimum 0.01 lots[/yellow]")
-            
-            # Ensure volume doesn't exceed position size
-            if volume_to_close > position.volume:
-                volume_to_close = position.volume
-                self.console.print("[yellow]Warning: Adjusted volume to match position size[/yellow]")
-            
-            # Get current price for the exit
-            symbol_info = mt5.symbol_info(self.symbol)
-            if symbol_info is None:
-                self.console.print("[red]Failed to get symbol info, cannot execute partial exit[/red]")
+            # First, get the full details of the current position
+            current_positions = mt5.positions_get(ticket=position.ticket)
+            if not current_positions:
+                self.console.print("[yellow]Position not found. It may have been closed already.[/yellow]")
                 return False
                 
-            price = mt5.symbol_info_tick(self.symbol).bid if position.type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(self.symbol).ask
+            # Get original position details
+            original_position = current_positions[0]
+            original_volume = original_position.volume
+            self.console.print(f"[dim]Original position size: {original_volume} lots[/dim]")
             
-            self.console.print(f"[yellow]Attempting partial exit: {volume_to_close} lots at {price}...[/yellow]")
+            # Calculate volume to close
+            volume_to_close = original_volume * exit_portion
             
-            # Double-check that volume is within allowed range
-            if symbol_info.volume_min is not None and symbol_info.volume_step is not None:
-                # Round to the nearest valid step
-                volume_to_close = round(volume_to_close / symbol_info.volume_step) * symbol_info.volume_step
-                self.console.print(f"[dim]Adjusted volume to broker requirements: {volume_to_close} lots[/dim]")
+            # Get symbol info to check minimum and step constraints
+            symbol_info = mt5.symbol_info(symbol_to_use)
+            if symbol_info is None:
+                self.console.print("[red]Failed to get symbol info, cannot determine volume constraints[/red]")
+                # Try anyway with default settings
+            else:
+                # Check broker's minimum and step constraints
+                min_volume = symbol_info.volume_min
+                volume_step = symbol_info.volume_step
                 
-                # Ensure it's not less than minimum
-                if volume_to_close < symbol_info.volume_min:
-                    volume_to_close = symbol_info.volume_min
-                    self.console.print(f"[yellow]Adjusted to minimum volume: {volume_to_close} lots[/yellow]")
+                self.console.print(f"[dim]Broker constraints: Min volume={min_volume}, Volume step={volume_step}[/dim]")
+                
+                # Ensure volume meets broker's requirements
+                if volume_step > 0:
+                    # Round to the nearest valid step
+                    volume_to_close = round(volume_to_close / volume_step) * volume_step
+                    
+                # Check if calculated volume is below minimum
+                if min_volume is not None and volume_to_close < min_volume:
+                    volume_to_close = min_volume
+                    self.console.print(f"[yellow]⚠️ Volume adjusted to broker minimum: {volume_to_close} lots[/yellow]")
+                    
+                    # Check if minimum lot size would effectively close the whole position
+                    remaining_after_exit = original_volume - volume_to_close
+                    if remaining_after_exit < min_volume:
+                        self.console.print(f"[yellow]⚠️ Remaining size ({remaining_after_exit} lots) would be below minimum ({min_volume} lots)[/yellow]")
+                        self.console.print("[yellow]This will effectively close the entire position[/yellow]")
+                
+                # Ensure volume doesn't exceed position size
+                if volume_to_close > original_volume:
+                    volume_to_close = original_volume
+                    self.console.print("[yellow]⚠️ Volume adjusted to match full position size[/yellow]")
             
-            # Simplified comment
-            comment = "Partial Exit"
+            # Get current price for the exit
+            tick = mt5.symbol_info_tick(symbol_to_use)
+            if tick is None:
+                self.console.print("[red]Failed to get symbol tick info, cannot execute partial exit[/red]")
+                return False
+                
+            price = tick.bid if original_position.type == mt5.ORDER_TYPE_BUY else tick.ask
+            
+            self.console.print(f"[yellow]Executing partial exit: {volume_to_close} lots of {original_volume} lots ({(volume_to_close/original_volume)*100:.1f}%) at {price}...[/yellow]")
             
             # Create the order request
             request = {
                 "action": mt5.TRADE_ACTION_DEAL,
-                "symbol": self.symbol,
+                "symbol": symbol_to_use,
                 "volume": volume_to_close,
-                "type": mt5.ORDER_TYPE_SELL if position.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
-                "position": position.ticket,
+                "type": mt5.ORDER_TYPE_SELL if original_position.type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
+                "position": original_position.ticket,
                 "price": price,
                 "deviation": 20,
                 "magic": 234000,
-                "comment": comment,
+                "comment": "PartialExit",  # Simplified comment - MT5 may have restrictions on comment format
                 "type_filling": mt5.ORDER_FILLING_IOC,
                 "type_time": mt5.ORDER_TIME_GTC
             }
@@ -1372,61 +1461,92 @@ class ETHEmaPsarBot:
                 error_code = mt5.last_error()
                 self.console.print(f"[red]MT5 order_send returned None. Error code: {error_code}[/red]")
                 
-                # Query broker for valid volume steps
-                symbol_info = mt5.symbol_info(self.symbol)
-                if symbol_info is not None:
-                    self.console.print(f"[yellow]Broker info: Min volume: {symbol_info.volume_min}, Step: {symbol_info.volume_step}[/yellow]")
+                # Try to get updated position info
+                updated_positions = mt5.positions_get(ticket=position.ticket)
+                if not updated_positions:
+                    self.console.print("[yellow]Position no longer exists - may have been closed by another process[/yellow]")
+                    return True
                     
-                    # Try again with corrected volume
-                    if symbol_info.volume_step > 0:
-                        corrected_volume = round(volume_to_close / symbol_info.volume_step) * symbol_info.volume_step
-                        if corrected_volume >= symbol_info.volume_min and corrected_volume <= position.volume:
-                            self.console.print(f"[yellow]Retrying with corrected volume: {corrected_volume}[/yellow]")
-                            request["volume"] = corrected_volume
-                            result = mt5.order_send(request)
-                        else:
-                            self.console.print(f"[red]Cannot execute partial exit: volume {corrected_volume} outside allowed range[/red]")
-                            return False
-                
-                # If still None after retry
-                if result is None:
-                    # Try to get updated position info
-                    positions = mt5.positions_get(ticket=position.ticket)
-                    if not positions:
-                        self.console.print("[yellow]Position no longer exists - may have been closed already[/yellow]")
-                        return True
-                        
-                    self.console.print("[red]Failed to execute partial exit[/red]")
-                    return False
+                self.console.print("[red]Failed to execute partial exit[/red]")
+                return False
             
             if result.retcode != mt5.TRADE_RETCODE_DONE:
                 self.console.print(f"[red]Partial exit failed: {result.comment} (code {result.retcode})[/red]")
                 
                 # Additional diagnostics for volume errors
                 if result.retcode == 10014:  # Invalid volume error
-                    symbol_info = mt5.symbol_info(self.symbol)
+                    # Get updated symbol info
+                    symbol_info = mt5.symbol_info(symbol_to_use)
                     if symbol_info is not None:
                         self.console.print(f"[yellow]Broker requires: Min volume: {symbol_info.volume_min}, Step: {symbol_info.volume_step}[/yellow]")
                         self.console.print(f"[yellow]We tried: {volume_to_close} lots[/yellow]")
                         
-                        # Try closing the full position instead
-                        self.console.print("[yellow]Attempting to close full position instead...[/yellow]")
-                        return self.close_position(position, reason + " (adjusted to full exit)")
+                        # Check if minimum lot size equals or exceeds position size
+                        if symbol_info.volume_min >= original_volume:
+                            self.console.print("[yellow]⚠️ Current position size is already at broker minimum. Cannot execute partial exit.[/yellow]")
+                            self.console.print("[yellow]To exit, the position must be closed completely.[/yellow]")
+                            
+                            # Ask user for confirmation to close completely
+                            self.console.print("[bold yellow]Would you like to close the entire position instead? (Automatically proceeding in 10 seconds)[/bold yellow]")
+                            
+                            # No interactivity - just proceed with full close
+                            time.sleep(10)
+                            return self.close_position(original_position, reason + " (adjusted to full exit due to broker minimum lot size)")
                 
                 return False
             else:
-                self.console.print(f"[green]✓ Partial exit successful: {volume_to_close} lots at {price} ({reason})[/green]")
-                self.console.print(f"[green]Profit for this portion: ${position.profit * (volume_to_close/original_volume):.2f}[/green]")
+                # Get updated position info to verify the partial exit worked
+                time.sleep(1)  # Wait a moment for the broker to process
+                updated_positions = mt5.positions_get(ticket=position.ticket)
+                
+                if not updated_positions:
+                    # Position closed completely, even though we requested partial
+                    self.console.print("[yellow]Position was closed completely, even though partial exit was requested[/yellow]")
+                    
+                    # Log the complete exit
+                    exit_data = {
+                        "action": "FULL_EXIT",
+                        "ticket": original_position.ticket,
+                        "volume": original_volume,
+                        "entryPrice": original_position.price_open,
+                        "exitPrice": price,
+                        "profit": original_position.profit,
+                        "exitReason": reason + " (became full exit)",
+                        "status": "FULL_CLOSE"
+                    }
+                    self.log_trade(exit_data)
+                    
+                    position_key = str(original_position.ticket)
+                    if position_key in self.partial_exits_taken:
+                        self.partial_exits_taken[position_key].add("exit_full")
+                    
+                    self.save_state()
+                    return True
+                
+                new_position = updated_positions[0]
+                new_volume = new_position.volume
+                volume_change = original_volume - new_volume
+                
+                if abs(volume_change) < 0.0001:  # No actual change in position size
+                    self.console.print("[red]⚠️ MT5 reported success, but position size did not change![/red]")
+                    self.console.print(f"[yellow]Original: {original_volume} lots, Current: {new_volume} lots[/yellow]")
+                    self.console.print("[yellow]The partial exit may have failed due to broker-specific rules[/yellow]")
+                    return False
+                
+                # Successful partial exit
+                self.console.print(f"[green]✓ Partial exit successful: {volume_change} lots at {price} ({reason})[/green]")
+                self.console.print(f"[green]Position size reduced from {original_volume} to {new_volume} lots[/green]")
+                self.console.print(f"[green]Profit for this portion: ${original_position.profit * (volume_change/original_volume):.2f}[/green]")
                 
                 # Log partial exit
                 exit_data = {
                     "action": "PARTIAL_EXIT",
-                    "ticket": position.ticket,
+                    "ticket": original_position.ticket,
                     "exitPortion": exit_portion,
-                    "volume": volume_to_close,
-                    "entryPrice": position.price_open,
-                    "soldAt" if position.type == mt5.ORDER_TYPE_BUY else "boughtAt": price,
-                    "profit": position.profit * (volume_to_close/original_volume),
+                    "volume": volume_change,
+                    "entryPrice": original_position.price_open,
+                    "exitPrice": price,
+                    "profit": original_position.profit * (volume_change/original_volume),
                     "exitReason": reason,
                     "status": "PARTIAL_CLOSE"
                 }
@@ -1471,6 +1591,11 @@ class ETHEmaPsarBot:
                     self.last_psar_direction = state.get('last_psar_direction', None)
                     self.psar_direction_changed = state.get('psar_direction_changed', False)
                     self.psar_direction_change_time = state.get('psar_direction_change_time', None)
+                    
+                    # Load counter-trend tracking
+                    self.counter_trend_positions = state.get('counter_trend_positions', {})
+                    self.counter_trend_active = state.get('counter_trend_active', False)
+                    self.last_counter_trend_check = state.get('last_counter_trend_check', 0)
                 
                 self.console.print("[green]State loaded successfully[/green]")
             else:
@@ -1483,6 +1608,9 @@ class ETHEmaPsarBot:
                 self.last_psar_direction = None
                 self.psar_direction_changed = False
                 self.psar_direction_change_time = None
+                self.counter_trend_positions = {}
+                self.counter_trend_active = False
+                self.last_counter_trend_check = 0
         except Exception as e:
             self.console.print(f"[yellow]No previous state loaded: {str(e)}[/yellow]")
             # Initialize with default values
@@ -1494,6 +1622,9 @@ class ETHEmaPsarBot:
             self.last_psar_direction = None
             self.psar_direction_changed = False
             self.psar_direction_change_time = None
+            self.counter_trend_positions = {}
+            self.counter_trend_active = False
+            self.last_counter_trend_check = 0
 
     def save_state(self):
         """Save the bot's state to a file"""
@@ -1515,7 +1646,10 @@ class ETHEmaPsarBot:
                 'partial_exits_taken': partial_exits_json,
                 'last_psar_direction': self.last_psar_direction,
                 'psar_direction_changed': self.psar_direction_changed,
-                'psar_direction_change_time': self.psar_direction_change_time
+                'psar_direction_change_time': self.psar_direction_change_time,
+                'counter_trend_positions': self.counter_trend_positions,
+                'counter_trend_active': self.counter_trend_active,
+                'last_counter_trend_check': self.last_counter_trend_check
             }
             
             with open(self.state_file, 'w') as f:
@@ -1608,36 +1742,456 @@ class ETHEmaPsarBot:
             import traceback
             self.console.print(f"[red]{traceback.format_exc()}[/red]")
 
+    def check_for_counter_trend_opportunity(self, df, position):
+        """Check if there's an opportunity for a counter-trend trade"""
+        try:
+            # Make sure we have a valid active symbol
+            symbol_to_use = self.active_symbol or self.symbol
+            
+            if df is None or len(df) < 4:  # Need at least 4 bars for ROC calculations
+                return None
+            
+            # Get the latest data
+            last_row = df.iloc[-1]
+            prev_row = df.iloc[-2]
+            
+            # Current indicators
+            current_price = last_row['close']
+            prev_price = prev_row['close']
+            ema_fast = last_row['ema_9']
+            ema_slow = last_row['ema_20']
+            psar = last_row['psar']
+            psar_direction = last_row['psar_direction']
+            prev_psar_direction = prev_row['psar_direction']
+            
+            # Check if we have the gap metrics
+            if 'ema_gap' not in last_row or 'ema_gap_roc_3' not in last_row:
+                self.console.print("[yellow]Missing EMA gap metrics, can't check for counter-trend opportunities[/yellow]")
+                return None
+            
+            # Get the EMA gap metrics
+            ema_gap = last_row['ema_gap']
+            ema_gap_roc_3 = last_row['ema_gap_roc_3']
+            gap_widening = last_row['gap_widening']
+            
+            # Calculate current profit percentage for the position
+            entry_price = position.price_open
+            current_position_price = position.price_current
+            profit_pct = ((current_position_price / entry_price) - 1) * 100
+            if position.type == mt5.POSITION_TYPE_SELL:
+                profit_pct = -profit_pct
+            
+            # Initialize counter-trend signal to None
+            counter_signal = None
+            
+            # Only consider counter-trend if the current position is profitable
+            if profit_pct < 0.15:  # Minimum profit threshold
+                self.console.print("[dim]Position not profitable enough for counter-trend strategy[/dim]")
+                return None
+            
+            # Display counter-trend analysis
+            self.console.print("\n=== Counter-Trend Analysis ===")
+            self.console.print(f"Current Position: {'BUY' if position.type == mt5.POSITION_TYPE_BUY else 'SELL'}")
+            self.console.print(f"Current Profit: {profit_pct:.2f}%")
+            self.console.print(f"PSAR Direction: {'Bullish' if psar_direction == 1 else 'Bearish'}")
+            self.console.print(f"PSAR Direction Changed: {'Yes' if psar_direction != prev_psar_direction else 'No'}")
+            self.console.print(f"EMA Gap: {ema_gap:.4f}")
+            self.console.print(f"EMA Gap ROC (3-period): {ema_gap_roc_3:.2f}%")
+            self.console.print(f"Gap Widening: {'Yes' if gap_widening else 'No'}")
+            
+            # Check if PSAR has just flipped direction (from previous bar to current)
+            psar_flipped = psar_direction != prev_psar_direction
+            
+            # For a BUY position, check for counter-trend SELL opportunity
+            if position.type == mt5.POSITION_TYPE_BUY:
+                # Check if PSAR is bearish (above price) or just flipped bearish
+                psar_is_bearish = psar_direction == -1
+                psar_flipped_bearish = psar_flipped and psar_is_bearish
+                
+                # Check price movement is downward
+                price_moving_down = current_price < prev_price
+                
+                # Check if price is near EMA fast line but not crossed below slow line
+                price_near_ema9 = current_price < ema_fast * 1.005  # Within 0.5% of EMA9
+                
+                # Check for significant previous trend strength
+                strong_trend = ema_gap_roc_3 > 5.0  # Gap was widening rapidly
+                
+                # Check for trend reversal signs - now using psar_is_bearish instead of requiring a flip
+                reversal_signal = not gap_widening and psar_is_bearish
+                
+                # Log conditions - show both if PSAR just flipped and if it's currently in the right direction
+                self.console.print("\n[bold]Counter-trend SELL conditions:[/bold]")
+                self.console.print(f"✓ PSAR Just Flipped Bearish: {'✅' if psar_flipped_bearish else '❌'}")
+                self.console.print(f"✓ PSAR Is Bearish: {'✅' if psar_is_bearish else '❌'}")
+                self.console.print(f"✓ Price Moving Down: {'✅' if price_moving_down else '❌'}")
+                self.console.print(f"✓ Price Near EMA9: {'✅' if price_near_ema9 else '❌'}")
+                self.console.print(f"✓ Previous Strong Trend (EMA Gap ROC): {'✅' if strong_trend else '❌'}")
+                self.console.print(f"✓ Reversal Signal (Gap Narrowing): {'✅' if not gap_widening else '❌'}")
+                
+                # Consider counter-trend SELL if conditions are met (now using psar_is_bearish instead of requiring a flip)
+                if psar_is_bearish and price_moving_down and price_near_ema9:
+                    counter_signal = "SELL"
+                    self.console.print("[bold red]Counter-trend SELL opportunity detected![/bold red]")
+            
+            # For a SELL position, check for counter-trend BUY opportunity
+            elif position.type == mt5.POSITION_TYPE_SELL:
+                # Check if PSAR is bullish (below price) or just flipped bullish
+                psar_is_bullish = psar_direction == 1
+                psar_flipped_bullish = psar_flipped and psar_is_bullish
+                
+                # Check price movement is upward
+                price_moving_up = current_price > prev_price
+                
+                # Check if price is near EMA fast line but not crossed above slow line
+                price_near_ema9 = current_price > ema_fast * 0.995  # Within 0.5% of EMA9
+                
+                # Check for significant previous trend strength
+                strong_trend = ema_gap_roc_3 > 5.0  # Gap was widening rapidly
+                
+                # Check for trend reversal signs - now using psar_is_bullish instead of requiring a flip
+                reversal_signal = not gap_widening and psar_is_bullish
+                
+                # Log conditions - show both if PSAR just flipped and if it's currently in the right direction
+                self.console.print("\n[bold]Counter-trend BUY conditions:[/bold]")
+                self.console.print(f"✓ PSAR Just Flipped Bullish: {'✅' if psar_flipped_bullish else '❌'}")
+                self.console.print(f"✓ PSAR Is Bullish: {'✅' if psar_is_bullish else '❌'}")
+                self.console.print(f"✓ Price Moving Up: {'✅' if price_moving_up else '❌'}")
+                self.console.print(f"✓ Price Near EMA9: {'✅' if price_near_ema9 else '❌'}")
+                self.console.print(f"✓ Previous Strong Trend (EMA Gap ROC): {'✅' if strong_trend else '❌'}")
+                self.console.print(f"✓ Reversal Signal (Gap Narrowing): {'✅' if not gap_widening else '❌'}")
+                
+                # Consider counter-trend BUY if conditions are met (now using psar_is_bullish instead of requiring a flip)
+                if psar_is_bullish and price_moving_up and price_near_ema9:
+                    counter_signal = "BUY"
+                    self.console.print("[bold green]Counter-trend BUY opportunity detected![/bold green]")
+            
+            return counter_signal
+            
+        except Exception as e:
+            self.console.print(f"[red]Error in check_for_counter_trend_opportunity: {str(e)}[/red]")
+            import traceback
+            self.console.print(f"[red]{traceback.format_exc()}[/red]")
+            return None
+
+    def execute_counter_trend_trade(self, signal, df, original_position):
+        """Execute a counter-trend trade to capture retracements"""
+        try:
+            last_row = df.iloc[-1]
+            
+            # Make sure we have a valid active symbol
+            symbol_to_use = self.active_symbol or self.symbol
+            
+            # Get current price for entry
+            price = mt5.symbol_info_tick(symbol_to_use).ask if signal == "BUY" else mt5.symbol_info_tick(symbol_to_use).bid
+            
+            # Get key target/indicator prices
+            ema9 = last_row['ema_9']
+            ema20 = last_row['ema_20']
+            psar = last_row['psar']
+            
+            # Use smaller lot size for counter-trend trades (50% of regular)
+            counter_trend_lot_size = self.lot_size * 0.5  
+            
+            # Calculate profit target based on distance to EMA20
+            if signal == "BUY":
+                # For counter-trend BUY, target is near EMA20 (resistance)
+                target_price = ema20
+                # Stop loss is just below recent PSAR
+                stop_loss = psar * 0.995  # 0.5% below PSAR
+            else:  # SELL
+                # For counter-trend SELL, target is near EMA20 (support)
+                target_price = ema20
+                # Stop loss is just above recent PSAR
+                stop_loss = psar * 1.005  # 0.5% above PSAR
+            
+            # Calculate potential R:R ratio
+            potential_gain = abs(target_price - price)
+            potential_loss = abs(price - stop_loss)
+            risk_reward = potential_gain / potential_loss if potential_loss > 0 else 0
+            
+            # Only proceed if R:R is acceptable (at least 1.5:1)
+            if risk_reward < 1.5:
+                self.console.print(f"[yellow]Counter-trend trade rejected: Risk-reward ratio too low ({risk_reward:.2f})[/yellow]")
+                return False
+            
+            # Create unique identifier for this counter-trend trade
+            counter_trend_id = f"counter_{original_position.ticket}_{int(time.time())}"
+            
+            # Prepare trade request
+            request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol_to_use,
+                "volume": counter_trend_lot_size,
+                "type": mt5.ORDER_TYPE_BUY if signal == "BUY" else mt5.ORDER_TYPE_SELL,
+                "price": price,
+                "sl": stop_loss,
+                "tp": target_price,
+                "deviation": 20,  # Allow slight price deviation
+                "magic": 123457,  # Different magic number to identify counter-trend trades
+                "comment": f"Counter-trend {signal} against position {original_position.ticket}",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_FOK,
+            }
+            
+            # Display trade details
+            self.console.print("\n=== Counter-Trend Trade Execution ===")
+            self.console.print(f"Signal: {signal}")
+            self.console.print(f"Entry Price: {price}")
+            self.console.print(f"Stop Loss: {stop_loss}")
+            self.console.print(f"Take Profit: {target_price}")
+            self.console.print(f"Risk-Reward Ratio: {risk_reward:.2f}")
+            self.console.print(f"Position Size: {counter_trend_lot_size} lots")
+            
+            # Execute the trade
+            result = mt5.order_send(request)
+            
+            if result.retcode == mt5.TRADE_RETCODE_DONE:
+                self.console.print(f"[bold green]Counter-trend {signal} executed successfully![/bold green]")
+                self.console.print(f"Order ID: {result.order}")
+                
+                # Log the trade
+                trade_data = {
+                    "type": "COUNTER_" + signal,
+                    "original_position": original_position.ticket,
+                    "ticket": result.order,
+                    "entry_price": price,
+                    "stop_loss": stop_loss,
+                    "take_profit": target_price,
+                    "lot_size": counter_trend_lot_size,
+                    "time": datetime.now().isoformat(),
+                    "risk_reward": float(risk_reward),
+                    "ema9_at_entry": float(ema9),
+                    "ema20_at_entry": float(ema20),
+                    "psar_at_entry": float(psar)
+                }
+                self.log_trade(trade_data)
+                
+                # Track this counter-trend position in our state
+                self.counter_trend_positions[str(result.order)] = {
+                    "original_position": original_position.ticket,
+                    "signal": signal,
+                    "entry_time": time.time(),
+                    "entry_price": price
+                }
+                self.counter_trend_active = True
+                self.last_counter_trend_check = time.time()
+                self.save_state()
+                
+                # Adjust the stop loss of the original position to break-even or small profit
+                # This helps protect our profits in the original position
+                if original_position.type == mt5.POSITION_TYPE_BUY:
+                    # For BUY positions, set SL to entry price + small buffer
+                    new_sl = original_position.price_open * 1.001  # 0.1% above entry
+                    
+                    # Only update if new SL is higher than current SL
+                    if original_position.sl is None or new_sl > original_position.sl:
+                        sl_request = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "symbol": self.symbol,
+                            "position": original_position.ticket,
+                            "sl": new_sl,
+                            "tp": original_position.tp  # Keep TP unchanged
+                        }
+                        
+                        sl_result = mt5.order_send(sl_request)
+                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
+                            self.console.print(f"[green]Updated original position stop loss to break-even+: {new_sl:.2f}[/green]")
+                        else:
+                            self.console.print(f"[yellow]Failed to update original position stop loss: {sl_result.comment}[/yellow]")
+                
+                elif original_position.type == mt5.POSITION_TYPE_SELL:
+                    # For SELL positions, set SL to entry price - small buffer
+                    new_sl = original_position.price_open * 0.999  # 0.1% below entry
+                    
+                    # Only update if new SL is lower than current SL
+                    if original_position.sl is None or new_sl < original_position.sl:
+                        sl_request = {
+                            "action": mt5.TRADE_ACTION_SLTP,
+                            "symbol": self.symbol,
+                            "position": original_position.ticket,
+                            "sl": new_sl,
+                            "tp": original_position.tp  # Keep TP unchanged
+                        }
+                        
+                        sl_result = mt5.order_send(sl_request)
+                        if sl_result.retcode == mt5.TRADE_RETCODE_DONE:
+                            self.console.print(f"[green]Updated original position stop loss to break-even+: {new_sl:.2f}[/green]")
+                        else:
+                            self.console.print(f"[yellow]Failed to update original position stop loss: {sl_result.comment}[/yellow]")
+                
+                return True
+            else:
+                self.console.print(f"[bold red]Counter-trend trade execution failed![/bold red]")
+                self.console.print(f"Error Code: {result.retcode}")
+                self.console.print(f"Error Description: {result.comment}")
+                return False
+        
+        except Exception as e:
+            self.console.print(f"[red]Error executing counter-trend trade: {str(e)}[/red]")
+            import traceback
+            self.console.print(f"[red]{traceback.format_exc()}[/red]")
+            return False
+
+    def check_counter_trend_positions(self):
+        """Check status of counter-trend positions"""
+        try:
+            # Make sure we have a valid active symbol
+            symbol_to_use = self.active_symbol or self.symbol
+            
+            if not self.counter_trend_active or not self.counter_trend_positions:
+                return
+            
+            self.console.print("[dim]Checking counter-trend positions...[/dim]")
+            
+            # Get all current positions
+            positions = mt5.positions_get(symbol=symbol_to_use)
+            if positions is None:
+                self.console.print("[yellow]Failed to get positions for counter-trend check[/yellow]")
+                return
+            
+            active_tickets = [str(pos.ticket) for pos in positions]
+            counter_tickets = list(self.counter_trend_positions.keys())
+            
+            # Check which counter-trend positions are no longer active
+            for ticket in counter_tickets:
+                if ticket not in active_tickets:
+                    # This counter-trend position has been closed
+                    position_info = self.counter_trend_positions[ticket]
+                    self.console.print(f"[green]Counter-trend position {ticket} has been closed[/green]")
+                    
+                    # Remove from tracking
+                    self.counter_trend_positions.pop(ticket, None)
+            
+            # Update counter_trend_active flag if no positions left
+            if not self.counter_trend_positions:
+                self.counter_trend_active = False
+                self.console.print("[green]No more active counter-trend positions[/green]")
+            
+            # Clean up any counter-trend positions older than 24 hours
+            # (This is a safety measure to prevent tracking old positions forever)
+            current_time = time.time()
+            expired_tickets = []
+            
+            for ticket, info in self.counter_trend_positions.items():
+                if current_time - info["entry_time"] > 86400:  # 24 hours
+                    expired_tickets.append(ticket)
+            
+            for ticket in expired_tickets:
+                self.console.print(f"[yellow]Removing expired counter-trend position tracking: {ticket}[/yellow]")
+                self.counter_trend_positions.pop(ticket, None)
+            
+            # Save state after any changes
+            if expired_tickets or counter_tickets != list(self.counter_trend_positions.keys()):
+                self.save_state()
+                
+        except Exception as e:
+            self.console.print(f"[red]Error checking counter-trend positions: {str(e)}[/red]")
+            import traceback
+            self.console.print(f"[red]{traceback.format_exc()}[/red]")
+
+    def _find_valid_eth_symbol(self):
+        """Helper method to find a valid ETH symbol"""
+        # First try the default symbol
+        if self._test_symbol(self.symbol):
+            self.active_symbol = self.symbol
+            self.console.print(f"[green]Default symbol {self.symbol} is working[/green]")
+            return True
+            
+        # Try alternative symbols
+        for alt_symbol in self.alt_symbols:
+            if self._test_symbol(alt_symbol):
+                self.active_symbol = alt_symbol
+                self.console.print(f"[yellow]Using alternative symbol {alt_symbol} instead of {self.symbol}[/yellow]")
+                return True
+                
+        # If no symbol works, try to find any ETH-related symbols
+        symbols = mt5.symbols_get()
+        eth_symbols = [s.name for s in symbols if 'ETH' in s.name]
+        self.console.print(f"[yellow]Available ETH symbols: {eth_symbols}[/yellow]")
+        
+        for eth_symbol in eth_symbols:
+            if self._test_symbol(eth_symbol):
+                self.active_symbol = eth_symbol
+                self.console.print(f"[yellow]Using discovered symbol {eth_symbol} instead of {self.symbol}[/yellow]")
+                return True
+                
+        self.console.print("[red]Could not find any working ETH symbol![/red]")
+        return False
+        
+    def _test_symbol(self, symbol):
+        """Test if a symbol works properly"""
+        try:
+            # Try to get symbol info
+            symbol_info = mt5.symbol_info(symbol)
+            if symbol_info is None:
+                return False
+                
+            # Try to get a tick
+            tick = mt5.symbol_info_tick(symbol)
+            if tick is None:
+                return False
+                
+            # Check if tick has bid and ask
+            if not hasattr(tick, 'bid') or not hasattr(tick, 'ask'):
+                return False
+                
+            # Make sure values are not zero
+            if tick.bid == 0 and tick.ask == 0:
+                return False
+                
+            return True
+        except:
+            return False
+
 if __name__ == "__main__":
-    try:
-        bot = ETHEmaPsarBot()
-        
-        # Set up a recovery mechanism in case of crashes
-        max_restarts = 5
-        restart_count = 0
-        
-        while restart_count < max_restarts:
-            try:
-                bot.run()
-                break  # If run() completes normally, exit the loop
-            except Exception as e:
-                restart_count += 1
-                Console().print(f"[red]Bot crashed with error: {str(e)}[/red]")
-                import traceback
-                Console().print(f"[red]{traceback.format_exc()}[/red]")
-                Console().print(f"[yellow]Attempting restart {restart_count}/{max_restarts}...[/yellow]")
+    # Set up a recovery mechanism in case of crashes
+    max_restarts = 5
+    restart_count = 0
+    
+    while restart_count < max_restarts:
+        try:
+            console = Console()
+            console.print("[bold cyan]═════════════════════════════════════[/bold cyan]")
+            console.print("[bold cyan]  ETH EMA-PSAR Bot - Starting Up  [/bold cyan]")
+            console.print("[bold cyan]═════════════════════════════════════[/bold cyan]")
+            
+            # Initialize bot
+            bot = ETHEmaPsarBot()
+            
+            # Run the bot - this will handle its own internal errors
+            bot.run()
+            
+            # If run() completes normally (e.g. through KeyboardInterrupt), exit the loop
+            break
+            
+        except Exception as e:
+            restart_count += 1
+            console = Console()  # Create new console in case the previous one failed
+            console.print(f"[red]Bot crashed with error: {str(e)}[/red]")
+            import traceback
+            console.print(f"[red]{traceback.format_exc()}[/red]")
+            
+            # Only attempt restart if we haven't exceeded the maximum
+            if restart_count < max_restarts:
+                console.print(f"[yellow]Attempting restart {restart_count}/{max_restarts} in 10 seconds...[/yellow]")
                 time.sleep(10)
                 
-                # Reinitialize MT5 and bot if needed
-                mt5.shutdown()
-                time.sleep(3)
-                if not mt5.initialize():
-                    Console().print("[red]Failed to reinitialize MT5[/red]")
-                    continue
+                # Ensure clean shutdown of MT5 before restart
+                try:
+                    mt5.shutdown() 
+                except:
+                    pass
                     
-                bot = ETHEmaPsarBot()
-        
-    except Exception as e:
-        Console().print(f"[red]Fatal bot error: {str(e)}[/red]")
-    finally:
-        mt5.shutdown() 
+                time.sleep(3)
+            else:
+                console.print("[red]Maximum restart attempts reached. Bot will now exit.[/red]")
+    
+    # Ensure clean shutdown when exiting
+    try:
+        mt5.shutdown()
+        console.print("[green]MT5 connection closed successfully.[/green]")
+    except:
+        console.print("[yellow]Warning: MT5 shutdown may not have completed properly.[/yellow]")
+    
+    console.print("[bold cyan]ETH EMA-PSAR Bot has terminated.[/bold cyan]") 

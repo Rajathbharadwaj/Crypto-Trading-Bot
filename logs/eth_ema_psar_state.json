@@ -1,0 +1,26 @@
+{
+  "crossover_detected": false,
+  "crossover_type": null,
+  "crossover_price": null,
+  "crossover_time": null,
+  "partial_exits_taken": {
+    "1527579364": [
+      {
+        "exit_percentage": 0.3,
+        "time": "2025-03-09T20:55:25.293371",
+        "reason": "0.3% Partial Take Profit"
+      },
+      {
+        "exit_percentage": 0.5,
+        "time": "2025-03-09T20:55:28.251406",
+        "reason": "0.5% Partial Take Profit"
+      }
+    ]
+  },
+  "last_psar_direction": null,
+  "psar_direction_changed": false,
+  "psar_direction_change_time": null,
+  "counter_trend_positions": {},
+  "counter_trend_active": false,
+  "last_counter_trend_check": 0
+}

@@ -1,0 +1,4460 @@
+[
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1524079420,
+    "volume": 5.0,
+    "entryPrice": 2150.57,
+    "soldAt": 2138.63,
+    "profit": -59.7,
+    "exitReason": "EMA Crossover Against Position",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T00:46:41.515984"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1524326126,
+    "entryPrice": 2136.16,
+    "stopLoss": 2153.09,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.53%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2129.75,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2125.48,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2121.21,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T03:08:23.282226"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524326126,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2136.16,
+    "boughtAt": 2129.69,
+    "profit": 9.705,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T03:21:54.488616"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1524349361,
+    "entryPrice": 2132.9,
+    "stopLoss": 2159.85,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.84%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2126.5,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2122.24,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2117.97,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T03:24:33.342350"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1524349361,
+    "volume": 5.0,
+    "entryPrice": 2132.89,
+    "boughtAt": 2141.21,
+    "profit": -41.15,
+    "exitReason": "Trailing Stop Hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T06:53:59.830990"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524624294,
+    "entryPrice": 2144.52,
+    "stopLoss": 2121.86,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "0.70%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2150.95,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2155.24,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2159.53,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T07:00:00.304896"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524624294,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2144.52,
+    "soldAt": 2151.49,
+    "profit": 10.455,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T07:03:08.438242"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524672313,
+    "entryPrice": 2163.43,
+    "stopLoss": 2116.43,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.45%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2169.92,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2174.25,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2178.57,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T07:29:59.796780"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524672313,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2163.12,
+    "soldAt": 2169.78,
+    "profit": 9.989999999999998,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T07:35:47.668987"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524684400,
+    "entryPrice": 2166.46,
+    "stopLoss": 2126.66,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.22%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2172.96,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2177.29,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2181.63,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T07:38:04.657859"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524684400,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2166.69,
+    "soldAt": 2173.28,
+    "profit": 9.885,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T07:53:48.383350"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524715975,
+    "entryPrice": 2169.9,
+    "stopLoss": 2124.56,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.39%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2176.41,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2180.75,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2185.09,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T08:00:50.123904"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524715975,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2170.27,
+    "soldAt": 2177.69,
+    "profit": 11.13,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:05:49.026280"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524728814,
+    "entryPrice": 2173.63,
+    "stopLoss": 2129.6,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.35%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2180.15,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2184.5,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2188.85,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T08:09:30.349445"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524728814,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2173.59,
+    "soldAt": 2181.65,
+    "profit": 12.089999999999998,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:24:54.680886"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524728814,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2173.59,
+    "soldAt": 2184.53,
+    "profit": 11.487,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:25:22.477209"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524728814,
+    "exitPortion": 0.4,
+    "volume": 0.98,
+    "entryPrice": 2173.59,
+    "soldAt": 2189.97,
+    "profit": 16.052,
+    "exitReason": "Take Profit 3 (0.7%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:26:28.329386"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524759898,
+    "entryPrice": 2185.7,
+    "stopLoss": 2147.26,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.17%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2192.26,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2196.63,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2201.0,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T08:27:41.653138"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524759898,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2186.11,
+    "soldAt": 2192.94,
+    "profit": 10.245,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:30:47.826127"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524759898,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2186.11,
+    "soldAt": 2197.15,
+    "profit": 11.592,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:30:52.505875"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524768229,
+    "entryPrice": 2193.64,
+    "stopLoss": 2138.63,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.67%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2200.22,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2204.61,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2209.0,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T08:31:35.641243"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1524768229,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2193.4500000000003,
+    "soldAt": 2200.3,
+    "profit": 10.275,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T08:32:20.915321"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1524771172,
+    "entryPrice": 2196.5,
+    "stopLoss": 2141.42,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.67%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2203.09,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2207.48,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2211.88,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T08:32:56.202610"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1524771172,
+    "volume": 5.0,
+    "entryPrice": 2196.23,
+    "soldAt": 2179.39,
+    "profit": -84.2,
+    "exitReason": "PSAR Flipped Against Position, Trailing Stop Hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T09:50:30.310386"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525058287,
+    "entryPrice": 2192.4,
+    "stopLoss": 2169.41,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "0.70%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2198.98,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2203.36,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2207.75,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T11:54:06.915987"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525058287,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2193.2400000000002,
+    "soldAt": 2199.92,
+    "profit": 10.02,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T11:54:49.424941"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525062232,
+    "entryPrice": 2196.3,
+    "stopLoss": 2173.27,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "0.70%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2202.89,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2207.28,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2211.67,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T11:55:09.983068"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525062232,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2196.39,
+    "soldAt": 2209.27,
+    "profit": 19.32,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T12:18:54.315317"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525062232,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2196.39,
+    "soldAt": 2209.1,
+    "profit": 13.344,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T12:18:56.595003"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525062232,
+    "exitPortion": 0.4,
+    "volume": 0.98,
+    "entryPrice": 2196.39,
+    "soldAt": 2215.66,
+    "profit": 18.884,
+    "exitReason": "Take Profit 3 (0.7%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T12:19:02.595003"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525121512,
+    "entryPrice": 2208.56,
+    "stopLoss": 2172.46,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "1.09%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2215.19,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2219.6,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2224.02,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T12:19:17.370071"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525121512,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2207.78,
+    "soldAt": 2214.7,
+    "profit": 10.38,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T12:20:56.992965"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525121512,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2207.78,
+    "soldAt": 2218.98,
+    "profit": 11.76,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T12:21:01.757396"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525128837,
+    "entryPrice": 2215.52,
+    "stopLoss": 2179.31,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.09%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2222.17,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2226.6,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2231.03,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T12:21:11.269667"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525128837,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2214.87,
+    "soldAt": 2222.16,
+    "profit": 10.935,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T14:25:32.309231"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525261590,
+    "entryPrice": 2218.58,
+    "stopLoss": 2166.47,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.57%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2225.24,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2229.67,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2234.11,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T14:32:05.374320"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525261590,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2218.87,
+    "soldAt": 2226.42,
+    "profit": 11.325,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T14:36:44.316733"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525269341,
+    "entryPrice": 2222.13,
+    "stopLoss": 2169.93,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.57%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2228.8,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2233.24,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2237.68,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T14:40:57.271512"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525269341,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2222.09,
+    "soldAt": 2229.66,
+    "profit": 11.355,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T14:48:32.054268"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525269341,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2222.09,
+    "soldAt": 2233.67,
+    "profit": 12.159,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T14:49:23.888833"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525275317,
+    "entryPrice": 2229.54,
+    "stopLoss": 2178.82,
+    "reason": "PSAR below Average PSAR range, showing strong bullish signal",
+    "psarDistance": "1.52%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2236.23,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2240.69,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2245.15,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T14:51:00.941642"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525275317,
+    "volume": 5.0,
+    "entryPrice": 2229.86,
+    "soldAt": 2214.58,
+    "profit": -76.0,
+    "exitReason": "PSAR Flipped Against Position, Trailing Stop Hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T16:53:18.144959"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525383512,
+    "entryPrice": 2203.03,
+    "stopLoss": 2236.51,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.01%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2196.42,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2192.01,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2187.61,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T18:30:02.311672"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525383512,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2203.03,
+    "boughtAt": 2196.2,
+    "profit": 10.245,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T18:36:45.636879"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525388610,
+    "entryPrice": 2199.65,
+    "stopLoss": 2232.9,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.01%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2193.05,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2188.65,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2184.25,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T18:41:13.213151"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525388610,
+    "volume": 5.0,
+    "entryPrice": 2199.65,
+    "boughtAt": 2213.37,
+    "profit": -68.9,
+    "exitReason": "EMA Crossover Against Position",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T20:01:32.193541"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1525430849,
+    "entryPrice": 2214.93,
+    "stopLoss": 2194.86,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "0.60%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2221.57,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2226.0,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2230.43,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T20:01:37.570153"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525430849,
+    "volume": 5.0,
+    "entryPrice": 2215.05,
+    "soldAt": 2196.4,
+    "profit": -96.25,
+    "exitReason": "PSAR Flipped Against Position, Trailing Stop Hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T20:50:20.541035"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525460849,
+    "entryPrice": 2196.38,
+    "stopLoss": 2214.73,
+    "reason": "PSAR turned bearish with EMAs aligned and price moving down",
+    "psarDistance": "0.56%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2189.79,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2185.4,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2181.01,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T20:50:22.436003"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525460849,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2194.9500000000003,
+    "boughtAt": 2188.07,
+    "profit": 10.319999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T21:47:36.553460"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525460849,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2194.9500000000003,
+    "boughtAt": 2187.5,
+    "profit": 7.823999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T21:49:28.688117"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525460849,
+    "exitPortion": 0.3,
+    "volume": 0.73,
+    "entryPrice": 2194.9500000000003,
+    "boughtAt": 2183.63,
+    "profit": 8.26538775510204,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T21:54:45.342945"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1525460849,
+    "exitPortion": 0.4,
+    "volume": 0.6900000000000001,
+    "entryPrice": 2194.9500000000003,
+    "boughtAt": 2179.44,
+    "profit": 10.699011627906978,
+    "exitReason": "Take Profit 3 (0.7%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-08T22:06:11.072937"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1525512740,
+    "entryPrice": 2182.83,
+    "stopLoss": 2217.7,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.06%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2176.28,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2171.92,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2167.55,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-08T22:07:45.805837"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1525512740,
+    "volume": 5.0,
+    "entryPrice": 2182.7400000000002,
+    "boughtAt": 2193.74,
+    "profit": -55.0,
+    "exitReason": "Trailing Stop Hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-08T23:56:39.843372"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526440216,
+    "entryPrice": 2112.92,
+    "stopLoss": 2159.41,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.47%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2106.58,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2102.36,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2098.13,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T10:15:19.123879"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526441903,
+    "entryPrice": 2113.48,
+    "stopLoss": 2159.52,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.45%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2107.14,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2102.91,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2098.69,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T10:15:48.794020"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526441903,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2113.3,
+    "boughtAt": 2106.16,
+    "profit": 10.71,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T11:42:00.317436"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526633588,
+    "entryPrice": 2109.96,
+    "stopLoss": 2136.97,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.85%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2103.63,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2099.41,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2095.19,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T11:44:16.256110"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526633588,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2110.01,
+    "boughtAt": 2103.63,
+    "profit": 9.569999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T11:45:46.397276"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526633588,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2110.01,
+    "boughtAt": 2096.25,
+    "profit": 14.174999999999999,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T11:46:08.865332"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526633588,
+    "exitPortion": 0.4,
+    "volume": 0.98,
+    "entryPrice": 2110.01,
+    "boughtAt": 2093.44,
+    "profit": 16.236,
+    "exitReason": "Take Profit 3 (0.7%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T11:46:11.007945"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526650111,
+    "entryPrice": 2095.88,
+    "stopLoss": 2131.53,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.13%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2089.59,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2085.4,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2081.21,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T11:46:36.288809"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526650111,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2095.66,
+    "boughtAt": 2089.18,
+    "profit": 9.719999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:08:12.979845"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526650111,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2095.66,
+    "boughtAt": 2085.13,
+    "profit": 11.055,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:08:20.018496"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526650111,
+    "exitPortion": 0.4,
+    "volume": 0.98,
+    "entryPrice": 2095.66,
+    "boughtAt": 2080.9,
+    "profit": 14.463999999999997,
+    "exitReason": "Take Profit 3 (0.7%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:08:25.822101"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526708759,
+    "entryPrice": 2084.13,
+    "stopLoss": 2125.46,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.32%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2077.88,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2073.71,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2069.54,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:08:29.208359"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526708759,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2083.88,
+    "boughtAt": 2077.29,
+    "profit": 9.885,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:37:38.668507"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526708759,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2083.88,
+    "boughtAt": 2072.09,
+    "profit": 12.377999999999998,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:37:42.102063"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526798629,
+    "entryPrice": 2076.61,
+    "stopLoss": 2117.74,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.32%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2070.38,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2066.23,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2062.07,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:38:00.024992"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526798629,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2076.4,
+    "boughtAt": 2069.07,
+    "profit": 10.995,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:51:25.787377"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526838749,
+    "entryPrice": 2073.1,
+    "stopLoss": 2123.22,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.61%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2066.88,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2062.73,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2058.59,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:52:04.509801"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526838749,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2072.82,
+    "boughtAt": 2065.98,
+    "profit": 10.155,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:52:20.883536"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526838749,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2072.82,
+    "boughtAt": 2058.79,
+    "profit": 14.73,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:52:31.668630"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526838749,
+    "exitPortion": 0.4,
+    "volume": 0.98,
+    "entryPrice": 2072.82,
+    "boughtAt": 2057.26,
+    "profit": 15.247999999999998,
+    "exitReason": "Take Profit 3 (0.7%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T12:52:33.802104"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526843817,
+    "entryPrice": 2053.02,
+    "stopLoss": 2102.65,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.61%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2046.86,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2042.75,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2038.65,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T12:52:44.654491"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526843817,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2054.12,
+    "boughtAt": 2047.33,
+    "profit": 10.185,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:01:26.600551"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526843817,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2054.12,
+    "boughtAt": 2043.25,
+    "profit": 11.411999999999999,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:01:30.023932"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526867182,
+    "entryPrice": 2047.63,
+    "stopLoss": 2126.55,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "2.57%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2041.49,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2037.39,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2033.3,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T13:01:52.790490"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526867182,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2047.98,
+    "boughtAt": 2041.27,
+    "profit": 10.065,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:07:53.597965"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526867182,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2047.98,
+    "boughtAt": 2037.62,
+    "profit": 10.877999999999998,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:07:59.439720"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526879656,
+    "entryPrice": 2040.8,
+    "stopLoss": 2113.65,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "2.38%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2034.68,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2030.6,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2026.51,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T13:08:06.436854"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526879656,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2040.5800000000002,
+    "boughtAt": 2034.0,
+    "profit": 9.87,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:21:47.920253"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526879656,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2040.5800000000002,
+    "boughtAt": 2029.88,
+    "profit": 11.235000000000001,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:21:50.274764"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526913902,
+    "entryPrice": 2034.11,
+    "stopLoss": 2091.53,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.88%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2028.01,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2023.94,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2019.87,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T13:22:01.431224"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526913902,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2033.19,
+    "boughtAt": 2026.69,
+    "profit": 9.75,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:41:32.894414"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526913902,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2033.19,
+    "boughtAt": 2022.84,
+    "profit": 10.868999999999998,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:41:36.298565"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526954631,
+    "entryPrice": 2026.45,
+    "stopLoss": 2086.93,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.99%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2020.37,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2016.32,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2012.26,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T13:41:49.969809"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526954631,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2025.9,
+    "boughtAt": 2018.37,
+    "profit": 11.295,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T13:57:28.758175"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1526984046,
+    "entryPrice": 2022.79,
+    "stopLoss": 2072.9,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.65%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2016.72,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2012.68,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2008.63,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T13:57:44.997570"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1526984046,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2022.82,
+    "boughtAt": 2014.87,
+    "profit": 11.924999999999999,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:18:25.928673"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527017404,
+    "entryPrice": 2019.65,
+    "stopLoss": 2060.0,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.33%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2013.59,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2009.55,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2005.51,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:18:39.196736"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527017404,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2019.3500000000001,
+    "boughtAt": 2012.14,
+    "profit": 10.815,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:19:13.711072"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527020178,
+    "entryPrice": 2016.95,
+    "stopLoss": 2057.24,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "1.33%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2010.9,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2006.87,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2002.83,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:20:17.104678"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527020178,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2016.95,
+    "boughtAt": 2010.63,
+    "profit": 9.48,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:41:20.579014"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527072834,
+    "entryPrice": 2022.5,
+    "stopLoss": 2051.98,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.97%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2016.43,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2012.39,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2008.34,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:45:00.887703"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527072834,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2022.69,
+    "boughtAt": 2016.09,
+    "profit": 9.9,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:47:42.780761"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527072834,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2022.69,
+    "boughtAt": 2012.29,
+    "profit": 10.92,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:48:20.636194"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527079830,
+    "entryPrice": 2015.47,
+    "stopLoss": 2038.75,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.77%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2009.42,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2005.39,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2001.36,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:49:09.178061"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527079830,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2015.13,
+    "boughtAt": 2004.86,
+    "profit": 15.405,
+    "exitReason": "Take Profit 1 (0.3%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:51:23.263281"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527079830,
+    "exitPortion": 0.3,
+    "volume": 1.05,
+    "entryPrice": 2015.13,
+    "boughtAt": 2003.96,
+    "profit": 11.73,
+    "exitReason": "Take Profit 2 (0.5%)",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T14:51:27.940268"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527088044,
+    "entryPrice": 2008.5,
+    "stopLoss": 2031.7,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.77%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2002.47,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 1998.46,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 1994.44,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T14:51:40.056199"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "SELL",
+    "ticket": 1527101406,
+    "entryPrice": 2025.05,
+    "stopLoss": 2051.48,
+    "reason": "PSAR above Average PSAR range, showing strong bearish signal",
+    "psarDistance": "0.87%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2018.97,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2014.92,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2010.87,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T15:00:00.695368"
+  },
+  {
+    "action": "FULL_EXIT",
+    "ticket": 1527101406,
+    "volume": 5.0,
+    "entryPrice": 2025.24,
+    "boughtAt": 2034.58,
+    "profit": -46.95,
+    "exitReason": "Trailing Stop Hit",
+    "status": "CLOSED",
+    "timestamp": "2025-03-09T15:16:11.412169"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.18,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:11.298042"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.12,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:12.743514"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:14.174147"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.08,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:15.786398"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.54,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:17.264652"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.05,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:18.774542"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.23,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:20.231937"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.63,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:21.678892"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.18,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:23.098478"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.43,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:24.590088"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.86,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:26.035820"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.56,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:27.507463"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.92,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:28.934269"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.83,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:30.383843"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.38,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:31.912246"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.0,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:33.340590"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.85,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:34.773291"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.21,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:36.243822"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.61,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:37.759565"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.32,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:39.241446"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.8,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:40.723429"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.94,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:42.179617"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.67,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:43.613578"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.82,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:47.712677"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.32,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:49.162077"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.57,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:50.632350"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.57,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:52.113740"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.71,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:53.550889"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.7,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:54.957284"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.61,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:56.467028"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.41,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:57.911022"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.03,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:04:59.343580"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.41,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:00.812419"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.54,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:02.289836"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.64,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:03.797813"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.37,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:44.590010"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.03,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:46.134533"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.43,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:47.599180"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.87,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:49.061037"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.97,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:50.508370"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.57,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:52.002193"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.58,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:53.472765"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.84,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:55.080885"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.77,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:56.647486"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.48,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:58.207215"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.61,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:05:59.758899"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.68,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:01.449457"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.44,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:02.908526"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.42,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:04.322593"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.41,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:05.885530"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:07.332196"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.52,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:08.849607"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.15,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:10.329107"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.29,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:11.845955"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.0,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:13.335223"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.91,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:14.850451"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.79,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:16.362462"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:17.869978"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.47,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:19.363857"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.93,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:20.788537"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.17,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:22.254661"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.67,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:23.775518"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.64,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:25.198695"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.26,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:26.693532"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2025.25,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:28.166882"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.58,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:31.006538"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.81,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:32.570685"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.44,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:34.095938"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.17,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:35.601101"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.45,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:37.074183"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.44,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:38.516016"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.93,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:40.034083"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.62,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:41.489024"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.13,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:42.947169"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.24,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:44.434146"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.61,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:45.953786"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.13,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:47.427838"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.1,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:48.983849"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.14,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:50.438001"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.45,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:51.894562"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.68,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:53.363730"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:54.862749"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.46,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:56.321023"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.17,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:57.796528"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.4,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:06:59.235155"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.43,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:00.765267"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.93,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:02.201505"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.72,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:03.677756"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.52,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:05.106274"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:06.557120"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.39,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:08.025179"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.82,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:09.445763"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.71,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:10.942081"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.46,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:12.403769"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.06,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:13.892749"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.8,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:15.324657"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.69,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:16.932175"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.86,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:18.403438"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.45,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:19.858809"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.58,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:21.375854"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.76,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:22.812052"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.79,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:24.310584"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.7,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:25.829311"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.7,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:27.315138"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.06,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:28.748696"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.2,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:30.186187"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.39,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:31.691961"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.54,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:33.272990"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.18,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:34.685555"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.78,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:36.127968"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.82,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:37.604071"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.19,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:39.172144"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.33,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:40.646154"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.98,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:42.085269"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.62,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:43.621194"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.01,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:45.192141"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.52,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:46.735780"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.2,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:48.203149"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.31,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:49.830543"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.25,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:51.409485"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.55,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:52.842827"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.02,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:54.261391"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.06,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:55.719012"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.69,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:57.186174"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.65,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:07:58.732216"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.6,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:00.232373"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.29,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:01.692985"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.31,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:03.249465"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.67,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:04.889680"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.88,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:06.361448"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.29,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:07.852717"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.62,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:09.438244"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.13,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:11.112033"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.6,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:12.732056"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.47,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:14.202330"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.66,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:15.673421"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.89,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:17.269982"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.46,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:18.773209"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.56,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:20.372261"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.22,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:22.077712"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.43,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:23.574480"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.63,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:25.256831"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2038.23,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:27.031123"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2039.33,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:28.773093"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2039.34,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:30.383563"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2038.3,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:31.929996"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.69,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:33.586329"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.91,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:35.151389"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.73,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:37.037763"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.76,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:38.509865"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.67,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:40.039877"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.52,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:41.496672"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.45,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:43.034410"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.84,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:44.521824"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.39,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:46.054253"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.57,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:47.494800"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.36,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:48.969936"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2037.08,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:50.439225"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2036.36,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:51.985033"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.95,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:53.530259"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.84,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:55.017666"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.82,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:56.514771"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.24,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:58.055809"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.49,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:08:59.539618"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.59,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:01.207376"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.37,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:02.886242"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.84,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:04.513465"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.31,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:06.059080"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.91,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:07.552640"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.76,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:09.128392"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.64,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:10.546585"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2035.56,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:12.025845"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2034.24,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:13.642191"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.77,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:15.181663"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.0,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:16.613317"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.44,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:18.137083"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.31,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:19.584068"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2033.08,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:21.073355"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.33,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:22.564180"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2032.68,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:24.207330"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.83,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:25.667564"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.24,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:27.164799"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.11,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:28.688453"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.77,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:30.208456"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.32,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:31.734114"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.18,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:33.284495"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.63,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:34.839060"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.02,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:36.507265"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.74,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:37.995785"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.9,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:39.490561"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.32,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:41.000727"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.39,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:42.563538"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.87,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:44.133370"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.7,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:45.563219"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.3,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:47.021421"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.89,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:48.642627"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.56,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:50.122216"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.52,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:51.674764"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.36,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:53.176905"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.84,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:54.826329"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2031.12,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:56.340305"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.32,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:57.818325"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:09:59.355182"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.67,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:00.805477"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.51,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:02.329446"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.62,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:03.854877"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.99,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:05.318859"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2030.32,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:06.761854"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.82,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:08.233699"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.62,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:09.749039"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.67,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:11.197759"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.55,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:12.688801"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.3,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:14.117076"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.24,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:15.739959"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.2,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:17.236640"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.41,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:18.693751"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.24,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:20.219506"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.11,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:21.712851"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.95,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:23.137244"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.7,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:24.567857"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.26,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:26.022496"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.13,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:27.475405"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.11,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:28.965275"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.95,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:30.485489"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.95,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:31.927835"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.71,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:33.600055"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.59,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:35.118237"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.12,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:36.673658"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.55,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:38.127723"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.44,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:39.580865"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.75,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:41.077087"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.61,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:42.546284"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.61,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:44.033857"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.25,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:45.505388"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.06,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:47.052174"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.07,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:48.620765"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.13,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:50.104773"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.1,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:51.590574"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.35,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:53.057473"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.94,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:54.502194"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.29,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:56.023438"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.05,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:57.545740"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.62,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:10:59.107500"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.57,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:00.669869"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:02.212553"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.06,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:03.699541"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.06,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:05.172491"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.08,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:06.845983"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.46,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:08.367737"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.54,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:09.853331"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.34,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:11.364502"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.29,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:13.033077"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.29,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:14.622820"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.35,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:16.200740"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.14,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:17.777856"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.96,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:19.314399"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.7,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:20.806741"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.21,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:22.294631"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.03,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:23.891719"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.64,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:25.390735"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.12,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:26.943811"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:28.389993"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.37,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:29.899449"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:31.369806"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.87,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:32.863421"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:34.368543"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.16,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:35.919717"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.45,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:37.408058"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.05,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:38.972081"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:40.483825"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.83,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:41.958176"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:43.389872"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.86,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:44.933601"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.72,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:46.458832"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.59,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:47.919754"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.02,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:49.349533"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.08,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:50.868498"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.5,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:52.360059"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.53,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:53.823119"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.97,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:55.350220"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.97,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:56.863298"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.79,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:58.287158"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2026.74,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:11:59.770301"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.45,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:01.299650"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.65,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:02.821665"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.88,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:04.385085"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.28,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:05.981860"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2029.0,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:07.495717"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.92,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:09.014926"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.57,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:10.515402"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.78,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:12.092986"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2028.27,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:13.564052"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.97,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:15.171998"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.85,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:16.634786"
+  },
+  {
+    "action": "ENTRY_FAILED",
+    "signal": "BUY",
+    "attemptedPrice": 2027.14,
+    "error": "Order failed: Invalid stops (code 10016)",
+    "errorCode": 10016,
+    "timestamp": "2025-03-09T20:12:18.226017"
+  },
+  {
+    "action": "ENTRY",
+    "signal": "BUY",
+    "ticket": 1527579364,
+    "entryPrice": 2026.75,
+    "stopLoss": 2006.48,
+    "reason": "PSAR turned bullish with EMAs aligned and price moving up",
+    "psarDistance": "-2.37%",
+    "exitStrategy": {
+      "exit1": {
+        "percentage": 0.3,
+        "price": 2032.83,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit2": {
+        "percentage": 0.5,
+        "price": 2036.88,
+        "portion": 0.3,
+        "status": "PENDING"
+      },
+      "exit3": {
+        "percentage": 0.7,
+        "price": 2040.94,
+        "portion": 0.4,
+        "status": "PENDING"
+      }
+    },
+    "status": "OPEN",
+    "timestamp": "2025-03-09T20:12:21.694471"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527579364,
+    "exitPortion": 0.3,
+    "volume": 1.5,
+    "entryPrice": 2026.78,
+    "exitPrice": 2033.07,
+    "profit": 9.434999999999999,
+    "exitReason": "0.3% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:44:13.973754"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527579364,
+    "exitPortion": 0.5,
+    "volume": 1.75,
+    "entryPrice": 2026.78,
+    "exitPrice": 2037.53,
+    "profit": 18.815,
+    "exitReason": "0.5% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:45:53.095225"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527579364,
+    "exitPortion": 0.3,
+    "volume": 0.52,
+    "entryPrice": 2026.78,
+    "exitPrice": 2037.99,
+    "profit": 5.8269714285714285,
+    "exitReason": "0.3% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:55:25.285804"
+  },
+  {
+    "action": "PARTIAL_EXIT",
+    "ticket": 1527579364,
+    "exitPortion": 0.5,
+    "volume": 0.62,
+    "entryPrice": 2026.78,
+    "exitPrice": 2038.66,
+    "profit": 7.364390243902438,
+    "exitReason": "0.5% Partial Take Profit",
+    "status": "PARTIAL_CLOSE",
+    "timestamp": "2025-03-09T20:55:28.219302"
+  }
+]
